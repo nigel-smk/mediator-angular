@@ -1,3 +1,10 @@
-<h1>
-  {{title}}
-</h1>
+<section id="speakers" class="container">
+  <div class="row">
+    <app-speaker-card
+      class="col-sm-6 center-block"
+      [speaker]=speaker
+      (click)="setActive(speaker)"
+      *ngFor="let speaker of speakers; trackBy:speaker?.name"
+    ></app-speaker-card>
+  </div>
+</section>
