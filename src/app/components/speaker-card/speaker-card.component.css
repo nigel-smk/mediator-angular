@@ -1,3 +1,4 @@
-/*.card {*/
-  /*width: 80px;*/
-/*}*/
+.card {
+  width: 20em;
+  text-align: center;
+}

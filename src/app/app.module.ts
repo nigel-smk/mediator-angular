@@ -7,12 +7,14 @@ import { AppComponent } from './app.component';
 import { SpeakerCardComponent } from './components/speaker-card/speaker-card.component';
 import { EqualizerComponent } from './components/equalizer/equalizer.component';
 import {UserMediaService} from "./services/user-media.service";
+import { AddSpeakerCardComponent } from './components/add-speaker-card/add-speaker-card.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SpeakerCardComponent,
-    EqualizerComponent
+    EqualizerComponent,
+    AddSpeakerCardComponent
   ],
   imports: [
     BrowserModule,

@@ -16,7 +16,7 @@ export class AppComponent implements OnInit{
   constructor(private userMedia: UserMediaService) {
     // mock speakers
     this.speakers.push({name: 'Nigel'});
-    this.speakers.push({name: 'Anton'});
+    this.speakers.push({name: 'Loisel'});
   }
 
   setActive(speaker: Speaker) {

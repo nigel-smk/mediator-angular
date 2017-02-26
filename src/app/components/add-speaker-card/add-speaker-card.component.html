@@ -1,0 +1,18 @@
+<div class="card" *ngIf="!active">
+  <div class="equalizer card-block">
+    <h3>Add a speaker</h3>
+  </div>
+  <div class="card-block">
+    <div class="plus-icon">
+      <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+    </div>
+  </div>
+</div>
+<div class="card" *ngIf="active">
+  <div class="equalizer card-block">
+    <app-equalizer [analyser]="speaker.analyser"></app-equalizer>
+  </div>
+  <div class="card-block">
+    <h4 class="card-title">{{speaker.name}}</h4>
+  </div>
+</div>

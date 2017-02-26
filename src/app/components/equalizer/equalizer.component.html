@@ -1,1 +1,18 @@
 <canvas #eq></canvas>
+<div class="FFT Specs" *ngIf="analyser">
+  <label for="fftSize">FFT Size: </label>
+  <input id="fftSize" type="text" [(ngModel)]="analyserInputs.fftSize" value="{{ analyser.fftSize }}" placeholder="{{ analyser.fftSize }}">
+  <label for="frequencyBinCount">Frequency Bin Count: </label>
+  <div id="frequencyBinCount">{{ analyser.frequencyBinCount }}</div>
+  <label for="minDecibels">Min Decibels: </label>
+  <input id="minDecibels" type="text" [(ngModel)]="analyserInputs.minDecibels" value="{{ analyser.minDecibels }}" placeholder="{{ analyser.minDecibels }}">
+  <label for="maxDecibels">Max Decibels: </label>
+  <input id="maxDecibels" type="text" [(ngModel)]="analyserInputs.maxDecibels" value="{{ analyser.maxDecibels }}" placeholder="{{ analyser.maxDecibels }}">
+  <label for="smoothingTimeConstant">Smoothing Time Constant: </label>
+  <input id="smoothingTimeConstant" type="text" [(ngModel)]="analyserInputs.smoothingTimeConstant" value="{{ analyser.smoothingTimeConstant }}" placeholder="{{ analyser.smoothingTimeConstant }}">
+  <label for="filterMin">Filter Min: </label>
+  <input id="filterMin" type="text" [(ngModel)]="filterInputs.min" value="{{ filter.min }}" placeholder="{{ filter.min }}">
+  <label for="filterMax">Filter Max: </label>
+  <input id="filterMax" type="text" [(ngModel)]="filterInputs.max" value="{{ filter.max }}" placeholder="{{ filter.max }}">
+  <button type="button" (click)="setValues()">Set</button>
+</div>
