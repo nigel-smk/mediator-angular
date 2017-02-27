@@ -1,11 +1,13 @@
 <div class="card" *ngIf="!active">
-  <div class="equalizer card-block">
-    <h3>Add a speaker</h3>
-  </div>
   <div class="card-block">
-    <div class="plus-icon">
-      <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
-    </div>
+    <svg
+      width="32"
+      height="32"
+      class="octicon"
+      aria-hidden="true"
+    >
+      <use xlink:href="/node_modules/octicons/build/sprite.octicons.svg#plus" /></svg>
+
   </div>
 </div>
 <div class="card" *ngIf="active">

@@ -8,14 +8,7 @@ import {Component, AfterViewInit, ViewChild, Input} from '@angular/core';
 export class EqualizerComponent implements AfterViewInit {
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
-  private analyserInputs: {
-    fftSize?: number,
-    frequencyBinCount?: number,
-    minDecibels?: number,
-    maxDecibels?: number,
-    smoothingTimeConstant?: number
-  } = {};
-  private filter: {min?: number, max?: number} = {min: 20, max: 20000};
+  private filter: {min?: number, max?: number} = {min: 50, max: 3000};
   private filterInputs: {min?: number, max?: number} = {};
 
   @ViewChild('eq') eqCanvas;
@@ -30,9 +23,45 @@ export class EqualizerComponent implements AfterViewInit {
     this.draw();
   }
 
-  setValues() {
-    Object.assign(this.analyser, this.analyserInputs);
-    this.filter = this.filterInputs;
+  setFilter() {
+    Object.assign(this.filter, this.filterInputs);
+  }
+
+  plusFftSize() {
+    if (this.analyser.fftSize === 32768) return;
+    this.analyser.fftSize *= 2;
+  }
+
+  minusFftSize() {
+    if (this.analyser.fftSize === 32) return;
+    this.analyser.fftSize /= 2;
+  }
+
+  // TODO write function that creates incrementer/decrementer functions
+
+  plusMinDecibels() {
+    if (this.analyser.minDecibels + 10 < this.analyser.maxDecibels) this.analyser.minDecibels += 10;
+  }
+
+  minusMinDecibels() {
+    this.analyser.minDecibels -= 10;
+  }
+
+  plusMaxDecibels() {
+    this.analyser.maxDecibels += 10;
+  }
+
+  minusMaxDecibels() {
+    if (this.analyser.maxDecibels - 10 > this.analyser.minDecibels) this.analyser.maxDecibels -= 10;
+  }
+
+  // TODO there is some funky stuff goin on with adding 0.1
+  plusSmoothingTimeConstant() {
+    if (this.analyser.smoothingTimeConstant !== 1) this.analyser.smoothingTimeConstant += 0.1;
+  }
+
+  minusSmoothingTimeConstant() {
+    if (this.analyser.smoothingTimeConstant !== 0) this.analyser.smoothingTimeConstant -= 0.1;
   }
 
   draw() {
@@ -55,13 +84,11 @@ export class EqualizerComponent implements AfterViewInit {
 
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // clear canvas
       ctx.fillStyle = '#00CCFF'; // color of the bars
-      let bars = 100; // TODO make bar count dependent on canvas width (currently assumes 50px)
-
-      for (let i = 0; i < bars; i++) {
-        // bars of total width 5px
-        let bar_x = i * 3;
-        let bar_width = 2;
-        let bar_height = -(Math.floor(filtered_fbc_array[i] / 2)); // max array value === 255
+      let bar_count = filtered_fbc_array.length; // TODO make bar count dependent on canvas width (currently assumes 50px)
+      let bar_width = Math.ceil(this.canvas.width / bar_count);
+      for (let i = 0; i < bar_count; i++) {
+        let bar_x = i * bar_width;
+        let bar_height = -(Math.floor(filtered_fbc_array[i])); // max array value === 255
         // let bar_height = -(Math.floor(fbc_array[i] / 2)); // max array value === 255
 
         ctx.fillRect(bar_x, this.canvas.height, bar_width, bar_height);
