@@ -1,9 +1,4 @@
-.card {
-  width: 20em;
-  text-align: center;
-}
-
-.plus-circle {
+.circle {
   display: flex;
   align-items: center;
   justify-content: center;

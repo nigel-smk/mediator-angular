@@ -1,64 +1,15 @@
-<canvas id="eq" #eq></canvas>
-<form class="FFT Specs" *ngIf="analyser">
-  <div class="form-group">
-    <label for="fftSize">FFT Size: </label>
-    <div class="input-group">
-      <span class="input-group-btn" (click)="minusFftSize()">
-        <button class="btn btn-secondary" type="button">-</button>
-      </span>
-      <div id="fftSize" class="form-control">{{ analyser.fftSize }}</div>
-      <span class="input-group-btn" (click)="plusFftSize()">
-        <button class="btn btn-secondary" type="button">+</button>
-      </span>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="frequencyBinCount">Frequency Bin Count: </label>
-    <div id="frequencyBinCount">{{ analyser.frequencyBinCount }}</div>
-  </div>
-  <div class="form-group">
-    <label for="minDecibels">Min Decibels: </label>
-    <div class="input-group">
-      <span class="input-group-btn" (click)="minusMinDecibels()">
-        <button class="btn btn-secondary" type="button">-</button>
-      </span>
-      <div id="minDecibels" class="form-control">{{ analyser.minDecibels }}</div>
-      <span class="input-group-btn" (click)="plusMinDecibels()">
-        <button class="btn btn-secondary" type="button">+</button>
-      </span>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="maxDecibels">Max Decibels: </label>
-    <div class="input-group">
-      <span class="input-group-btn" (click)="minusMaxDecibels()">
-        <button class="btn btn-secondary" type="button">-</button>
-      </span>
-      <div id="maxDecibels" class="form-control">{{ analyser.maxDecibels }}</div>
-      <span class="input-group-btn" (click)="plusMaxDecibels()">
-        <button class="btn btn-secondary" type="button">+</button>
-      </span>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="smoothingTimeConstant">Smoothing Time Constant: </label>
-    <div class="input-group">
-      <span class="input-group-btn" (click)="minusSmoothingTimeConstant()">
-        <button class="btn btn-secondary" type="button">-</button>
-      </span>
-      <div id="smoothingTimeConstant" class="form-control">{{ analyser.smoothingTimeConstant }}</div>
-      <span class="input-group-btn" (click)="plusSmoothingTimeConstant()">
-        <button class="btn btn-secondary" type="button">+</button>
-      </span>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="filterMin">Filter Min: </label>
-    <input id="filterMin" name="filterMin" type="text" class="form-control" [(ngModel)]="filterInputs.min" value="{{ filter.min }}" placeholder="{{ filter.min }}">
-  </div>
-  <div class="form-group">
-    <label for="filterMax">Filter Max: </label>
-    <input id="filterMax" name="filterMax" type="text" class="form-control" [(ngModel)]="filterInputs.max" value="{{ filter.max }}" placeholder="{{ filter.max }}">
-  </div>
-  <button type="button" (click)="setFilter()">Set Filter</button>
-</form>
+<div class="wrapper"
+     (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()"
+>
+  <canvas id="eq" #eq></canvas>
+  <app-floater-button
+    class="floater"
+    (onClick)="toggleSpecs()"
+    *ngIf="uiState.buttons"
+  ></app-floater-button>
+</div>
+<app-fft-spec
+  [analyser]="analyser" [analyserSpec]="analyserSpec"
+  (onFilterSet)="setFilter($event)"
+  *ngIf="uiState.specs"
+></app-fft-spec>
