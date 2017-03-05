@@ -1,30 +1,27 @@
 import { Injectable } from '@angular/core';
 import {UserMediaService} from "./user-media.service";
-import {Observable, ReplaySubject} from "rxjs";
+import {ReplaySubject} from "rxjs";
 
 @Injectable()
 export class AnalyserService {
 
-  private analyser$: ReplaySubject<AnalyserNode>;
   private _analyser: AnalyserNode;
-  private audioCtx: AudioContext;
+  private analyser$: ReplaySubject<AnalyserNode> = new ReplaySubject(1);
 
-  constructor(private userMedia: UserMediaService) { }
-
-  get analysers() {
-    return this.analyser$.asObservable();
-  }
-
-  setFftSize(size: number) {
-    this._analyser.fftSize = size;
-  }
-
-  init() {
+  constructor(private userMedia: UserMediaService) {
+    // TODO is it bad practice to subscribe in service?
     this.userMedia.streams.subscribe((stream: MediaStream) => {
-      this.audioCtx = new AudioContext();
-      this._analyser = this.audioCtx.createAnalyser();
+      let audioCtx = new AudioContext();
+      let source = audioCtx.createMediaStreamSource(stream);
+      this._analyser = audioCtx.createAnalyser();
+      source.connect(this._analyser); // connect analyser to mic input
+
       this.analyser$.next(this._analyser);
     });
+  }
+
+  get analyser() {
+    return this.analyser$.asObservable();
   }
 
 }

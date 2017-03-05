@@ -4,6 +4,7 @@
   <canvas id="eq" #eq></canvas>
   <app-floater-button
     class="floater"
+    [shape]="buttonShape"
     (onClick)="toggleSpecs()"
     *ngIf="uiState.buttons"
   ></app-floater-button>

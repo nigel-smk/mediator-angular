@@ -10,6 +10,8 @@ import {UserMediaService} from "./services/user-media.service";
 import { AddSpeakerCardComponent } from './components/add-speaker-card/add-speaker-card.component';
 import { FftSpecComponent } from './components/equalizer/fft-spec/fft-spec.component';
 import { FloaterButtonComponent } from './components/equalizer/floater-button/floater-button.component';
+import { HomeComponent } from './components/home/home.component';
+import {SpeakerStoreService} from "./stores/speaker-store.service";
 
 @NgModule({
   declarations: [
@@ -18,14 +20,18 @@ import { FloaterButtonComponent } from './components/equalizer/floater-button/fl
     EqualizerComponent,
     AddSpeakerCardComponent,
     FftSpecComponent,
-    FloaterButtonComponent
+    FloaterButtonComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpModule
   ],
-  providers: [UserMediaService],
+  providers: [
+    UserMediaService,
+    SpeakerStoreService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

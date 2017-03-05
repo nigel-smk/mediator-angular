@@ -1,10 +1,12 @@
-import {Component, OnInit, Output, EventEmitter} from '@angular/core';
+import {Component, OnInit, Output, EventEmitter, Input} from '@angular/core';
+
+export type CssShape = 'tri-up' | 'tri-down';
 
 @Component({
   selector: 'app-floater-button',
   template: `    
     <div class="circle" (click)="clicked($event)">
-      <div class="down-tri">
+      <div class="{{ shape }}">
       </div>
     </div>
 `,
@@ -13,6 +15,7 @@ import {Component, OnInit, Output, EventEmitter} from '@angular/core';
 export class FloaterButtonComponent implements OnInit {
 
   @Output() onClick = new EventEmitter();
+  @Input() shape: CssShape;
 
   constructor() { }
 

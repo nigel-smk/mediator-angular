@@ -1,0 +1,14 @@
+<section id="speakers" class="container">
+  <div class="row">
+    <div class="row mx-auto">
+      <app-speaker-card
+        [speaker]=speaker
+        (click)="setActive(speaker)"
+        *ngFor="let speaker of speakers; trackBy:speaker?.name"
+      ></app-speaker-card>
+    </div>
+  </div>
+  <div class="row">
+    <app-add-speaker-card class="mx-auto"></app-add-speaker-card>
+  </div>
+</section>

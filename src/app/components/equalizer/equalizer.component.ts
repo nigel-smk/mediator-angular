@@ -1,6 +1,7 @@
 import {Component, AfterViewInit, ViewChild, Input} from '@angular/core';
 import {FilterSpec} from "../../models/filterSpec.model";
 import {AnalyserSpec} from "../../models/analyserSpec.model";
+import {CssShape} from "./floater-button/floater-button.component";
 
 @Component({
   selector: 'app-equalizer',
@@ -13,6 +14,7 @@ export class EqualizerComponent implements AfterViewInit {
   private uiState: {buttons: boolean, specs: boolean} = {buttons: false, specs: false};
   // TODO place analyserSpec properties directly on analysernode?
   private analyserSpec: AnalyserSpec = {filter: {min: 50, max: 3000}};
+  private buttonShape: CssShape = 'tri-down';
 
   @ViewChild('eq') eqCanvas;
   @Input() analyser: AnalyserNode;
@@ -40,6 +42,7 @@ export class EqualizerComponent implements AfterViewInit {
 
   toggleSpecs() {
     this.uiState.specs = !this.uiState.specs;
+    this.buttonShape = this.uiState.specs ? 'tri-up' : 'tri-down';
   }
 
   draw() {
@@ -55,7 +58,7 @@ export class EqualizerComponent implements AfterViewInit {
       const SAMPLE_RATE = 44100;
 
       // set canvas height to contain all possible analyser values
-      this.canvas.height = this.analyser.maxDecibels - this.analyser.minDecibels;
+      this.canvas.height = 256;
 
       //this.analyser.fftSize = 256; // thus 16 bins {range: [32, 32768]}
       let fbc_array = new Uint8Array(this.analyser.frequencyBinCount); // fetch frequency data
