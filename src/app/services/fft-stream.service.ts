@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import {Observable, BehaviorSubject} from "rxjs";
+import {Observable, BehaviorSubject, ConnectableObservable, Subscription} from "rxjs";
 import {AnalyserService} from "./analyser.service";
+
 
 const SAMPLE_RATE = 44100;
 
@@ -9,8 +10,8 @@ export class FftStreamService {
 
   private _analyser: AnalyserNode;
   private _fftResult: Uint8Array;
-  private fft$: Observable<Uint8Array>;
-  private fftValve: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  private fft$: ConnectableObservable<Uint8Array>;
+  private fftConnection: Subscription;
   // TODO create streamSpec model
   private streamSpec: {binCount: number, filter: {min: number, max: number}} = {binCount: 10, filter: {min: 50, max: 3000}};
 
@@ -38,11 +39,11 @@ export class FftStreamService {
   }
 
   start() {
-    this.fftValve.next(true);
+    this.fftConnection = this.fft$.connect();
   }
 
   stop() {
-    this.fftValve.next(false);
+    this.fftConnection.unsubscribe();
   }
 
   init() {
@@ -57,16 +58,13 @@ export class FftStreamService {
 
   private _createFftStream(interval: number) {
     // create the fftStream
-    const fftStream = Observable
+    this.fft$ = Observable
       .interval(interval)
       .map(() => {
         this._analyser.getByteFrequencyData(this._fftResult);
-        //return Object.assign([], this._fftResult); // return copy of _fftResult for this interval
-        return this._binFrequencies(this._filterFrequencies(this._fftResult));
-      });
-
-    // create control valve for the stream (see: https://github.com/ReactiveX/rxjs/issues/1542)
-    this.fft$ = this.fftValve.switchMap(flow => flow ? fftStream : Observable.never()).publish();
+        return this._binFrequencies(this._filterFrequencies(this._fftResult)); // return copy of _fftResult for this interval
+      })
+      .publish();
   }
 
   private _filterFrequencies(fft: Uint8Array): Uint8Array {
