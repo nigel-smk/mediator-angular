@@ -12,6 +12,7 @@ import { FftSpecComponent } from './components/equalizer/fft-spec/fft-spec.compo
 import { FloaterButtonComponent } from './components/equalizer/floater-button/floater-button.component';
 import { HomeComponent } from './components/home/home.component';
 import {SpeakerStoreService} from "./stores/speaker-store.service";
+import {AnalyserService} from "./services/analyser.service";
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import {SpeakerStoreService} from "./stores/speaker-store.service";
   ],
   providers: [
     UserMediaService,
-    SpeakerStoreService
+    SpeakerStoreService,
+    AnalyserService
   ],
   bootstrap: [AppComponent]
 })

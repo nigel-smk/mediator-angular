@@ -4,6 +4,8 @@
       <app-speaker-card
         [speaker]=speaker
         (click)="setActive(speaker)"
+        (recordPress)="onRecordPress(speaker)"
+        (recordRelease)="onRecordRelease(speaker)"
         *ngFor="let speaker of speakers; trackBy:speaker?.name"
       ></app-speaker-card>
     </div>

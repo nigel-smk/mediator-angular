@@ -3,20 +3,10 @@
   text-align: center;
 }
 
-.plus-circle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.record {
+  float: right;
   height: 40px;
   width: 40px;
   border-radius: 40px;
-  background-color: aqua;
-}
-
-.down-tri {
-  width: 0px;
-  height: 0px;
-  border-top: 10px solid black;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
+  background-color: red;
 }
