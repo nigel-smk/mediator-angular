@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {Observable, BehaviorSubject, ConnectableObservable, Subscription} from "rxjs";
+import {Observable, ConnectableObservable, Subscription, Subject, BehaviorSubject} from "rxjs";
 import {AnalyserService} from "./analyser.service";
 
 
@@ -10,7 +10,9 @@ export class FftStreamService {
 
   private _analyser: AnalyserNode;
   private _fftResult: Uint8Array;
-  private fft$: ConnectableObservable<Uint8Array>;
+  // private fft$: ConnectableObservable<Uint8Array>;
+  private sourceSwitch$ = new BehaviorSubject<Observable<Uint8Array>>(Observable.never()); // initialise fft stream to never observable
+  private fft$: ConnectableObservable<Uint8Array> = this.sourceSwitch$.switchMap((obs) => obs).publish();
   private fftConnection: Subscription;
   // TODO create streamSpec model
   private streamSpec: {binCount: number, filter: {min: number, max: number}} = {binCount: 10, filter: {min: 50, max: 3000}};
@@ -58,13 +60,14 @@ export class FftStreamService {
 
   private _createFftStream(interval: number) {
     // create the fftStream
-    this.fft$ = Observable
+    let fftStream = Observable
       .interval(interval)
       .map(() => {
         this._analyser.getByteFrequencyData(this._fftResult);
         return this._binFrequencies(this._filterFrequencies(this._fftResult)); // return copy of _fftResult for this interval
-      })
-      .publish();
+      });
+
+    this.sourceSwitch$.next(fftStream);
   }
 
   private _filterFrequencies(fft: Uint8Array): Uint8Array {

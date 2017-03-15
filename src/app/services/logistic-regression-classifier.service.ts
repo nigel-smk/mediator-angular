@@ -1,34 +1,49 @@
 import { Injectable } from '@angular/core';
 import {SpeakerStoreService} from "../stores/speaker-store.service";
 import {Speaker} from "../models/speaker.model";
-import {BehaviorSubject, Observable} from "rxjs";
+import {Observable, Subscription, ConnectableObservable} from "rxjs";
 import {LogisticRegressionClassification} from "../models/LogisticRegressionClassification.model";
+import {FftStreamService} from "./fft-stream.service";
 
 import 'rxjs/add/operator/sampleTime';
 
 // js ml library in assets
 declare var ml: any;
 
+// TODO figure out how to set interval dynamically using a switchMap
 const INTERVAL = 33; // ~30fps
 
 @Injectable()
 export class LogisticRegressionClassifierService {
 
   private speakers: Speaker[] = [];
-  private classificationValve: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  private classification$: Observable<LogisticRegressionClassification>;
+  private classification$: ConnectableObservable<LogisticRegressionClassification>;
+  private connection: Subscription;
 
-  constructor(private speakerStore: SpeakerStoreService) {
+  constructor(private speakerStore: SpeakerStoreService, private fftStreamService: FftStreamService) {
     // TODO init in app.component?
     this.init();
   }
 
   public init() {
     this.speakerStore.speakers.subscribe((speakers) => this.speakers = speakers);
+    this.createClassifier();
   }
 
-  public feedClassifier(fftStream: Observable<Uint8Array>) {
-    const classificationStream = fftStream
+  public start() {
+    // TODO no classifier error
+    this.fftStreamService.start();
+    this.classification$.connect();
+  }
+
+  public stop() {
+    // TODO no connection error
+    this.connection.unsubscribe();
+    this.fftStreamService.stop();
+  }
+
+  public createClassifier() {
+    this.classification$ = this.fftStreamService.fft
       .sampleTime(INTERVAL)
       .map((analyserFrame) => {
         let result = {};
@@ -38,39 +53,36 @@ export class LogisticRegressionClassifierService {
         });
 
         return result;
-      });
-
-    // create control valve for the stream (see: https://github.com/ReactiveX/rxjs/issues/1542)
-    this.classification$ = this.classificationValve.switchMap(flow => flow ? classificationStream : Observable.never());
-  }
-
-  public start() {
-    this.classificationValve.next(true);
-  }
-
-  public stop() {
-    this.classificationValve.next(false);
+      })
+      .publish();
   }
 
   public train() {
-    // TODO import a linear algebra library
+    // TODO import a matrix
 
-    let labelVector = [];
-    let dataSet = [];
+    const label = {
+      match: [1,0],
+      noMatch: [0,1]
+    };
+
+    let labelVector: number[][] = [];
+    let allSamples: Uint8Array[] = [];
     let offSet = -100;
 
-    // collect all speaker data
+    // collect all speaker data and create a labelVector of the same length as allSamples, all set to "noMatch"
     this.speakers.forEach((speaker) => {
-      dataSet = [...dataSet, ...speaker.analyserFrames];
-      labelVector = [...labelVector, ...Array(speaker.analyserFrames.length).fill([0, 1])]
+      allSamples = [...allSamples, ...speaker.analyserFrames];
+      labelVector = [...labelVector, ...Array(speaker.analyserFrames.length).fill(label.noMatch)]
     });
 
-    // create labelVectors for each speaker
+    // create labelVectors for each speaker by swapping all indexes corresponding to the speakers speech with "match"
     let i = 0;
     this.speakers.forEach((speaker) => {
       // copy the labelVector and splice in positive labels for the speaker's range of values
-      speaker.dataSet = dataSet;
-      speaker.labelVector = Object.assign([], labelVector).splice(i, i + speaker.analyserFrames.length, ...Array(speaker.analyserFrames.length).fill([1, 0]));
+      speaker.dataSet = allSamples;
+      speaker.labelVector = Object.assign([], labelVector);
+      speaker.labelVector.splice(i, speaker.analyserFrames.length, ...Array(speaker.analyserFrames.length).fill(label.match));
+      i += speaker.analyserFrames.length;
     });
 
     this.speakers.forEach((speaker) => {

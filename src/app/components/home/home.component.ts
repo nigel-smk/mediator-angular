@@ -5,12 +5,13 @@ import {SpeakerStoreService} from "../../stores/speaker-store.service";
 import {AnalyserService} from "../../services/analyser.service";
 import {FftStreamService} from "../../services/fft-stream.service";
 import {Observable, Subscription} from "rxjs";
+import {LogisticRegressionClassifierService} from "../../services/logistic-regression-classifier.service";
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
-  providers: [AnalyserService, FftStreamService]
+  providers: [AnalyserService, FftStreamService, LogisticRegressionClassifierService]
 })
 export class HomeComponent implements OnInit{
 
@@ -22,7 +23,9 @@ export class HomeComponent implements OnInit{
   constructor(private userMedia: UserMediaService,
               private analyserService: AnalyserService,
               private fftStream: FftStreamService,
-              private speakerStore: SpeakerStoreService) { }
+              private speakerStore: SpeakerStoreService,
+              private classificationService: LogisticRegressionClassifierService
+  ) { }
 
   setActive(speaker: Speaker) {
     this.speakers.forEach((speaker) => {
@@ -44,6 +47,10 @@ export class HomeComponent implements OnInit{
     this.fft$.unsubscribe();
     this.fftStream.stop();
     console.log(speaker.analyserFrames);
+  }
+
+  trainModel() {
+    this.classificationService.train();
   }
 
   ngOnInit() {

@@ -13,6 +13,7 @@ import { FloaterButtonComponent } from './components/equalizer/floater-button/fl
 import { HomeComponent } from './components/home/home.component';
 import {SpeakerStoreService} from "./stores/speaker-store.service";
 import {AnalyserService} from "./services/analyser.service";
+import {FftStreamService} from "./services/fft-stream.service";
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import {AnalyserService} from "./services/analyser.service";
   providers: [
     UserMediaService,
     SpeakerStoreService,
-    AnalyserService
+    AnalyserService,
+    FftStreamService
   ],
   bootstrap: [AppComponent]
 })
