@@ -6,7 +6,7 @@ import {AnalyserService} from "../../services/analyser.service";
 import {FftStreamService} from "../../services/fft-stream.service";
 import {Observable, Subscription} from "rxjs";
 import {LogisticRegressionClassifierService} from "../../services/logistic-regression-classifier.service";
-import {LogisticRegressionClassification} from "../../models/LogisticRegressionClassification.model";
+import {LogRegClassification} from "../../models/LogisticRegressionClassification.model";
 
 @Component({
   selector: 'app-home',

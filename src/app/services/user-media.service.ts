@@ -1,15 +1,20 @@
 import { Injectable } from '@angular/core';
-import {ReplaySubject} from "rxjs";
+import {ReplaySubject, BehaviorSubject, Observable} from "rxjs";
 
 @Injectable()
 export class UserMediaService {
 
-  private mediaStream$: ReplaySubject<MediaStream> = new ReplaySubject<MediaStream>(1);
+  private mediaStream$: BehaviorSubject<MediaStream> = new BehaviorSubject<MediaStream>(Observable.never());
+  private sourceSwitch
 
   constructor() {
   }
 
   // TODO can I get multiple MediaStreams with different constraints?
+
+  getPrivateMediaStream() {
+
+  }
 
   public get publicUserMedia() {
     return this.mediaStream$.asObservable();

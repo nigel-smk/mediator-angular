@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {Observable, ConnectableObservable, Subscription} from "rxjs";
 import {FftSpec} from "../models/fftSpec.model";
+import {FftFrame} from "../models/fftFrame.model";
 
 
 const SAMPLE_RATE = 44100;
@@ -40,19 +41,19 @@ export class FftStreamService {
 
 export class FftFrameStream {
 
-  private fftFrame$: ConnectableObservable<Uint8Array>;
+  public fftFrame$: ConnectableObservable<FftFrame>;
   private analyser: AnalyserNode;
   private connection: Subscription;
 
   constructor(private analyserNode$: Observable<AnalyserNode>, private fftSpec: FftSpec) {
     this.fftFrame$ = analyserNode$.switchMap((analyser: AnalyserNode) => {
       this.analyser = analyser;
-      let fftResult = new Uint8Array(analyser.frequencyBinCount);
+      let fftFrame = new FftFrame(analyser.frequencyBinCount);
       return Observable
         .interval(fftSpec.interval)
         .map(() => {
-          analyser.getByteFrequencyData(fftResult);
-          return this.binFrequencies(this.filterFrequencies(fftResult)); // return copy of _fftResult for this interval
+          analyser.getByteFrequencyData(fftFrame);
+          return this.binFrequencies(this.filterFrequencies(fftFrame)); // return copy of fftFrame for this interval
         });
     }).publish();
   }
@@ -65,14 +66,14 @@ export class FftFrameStream {
     this.connection.unsubscribe();
   }
 
-  private filterFrequencies(fft: Uint8Array): Uint8Array {
+  private filterFrequencies(fft: FftFrame): FftFrame {
     return fft.filter((value: number, i: number) => {
       let binFrequency = i * SAMPLE_RATE / this.analyser.fftSize;
       return binFrequency > this.fftSpec.filter.min && binFrequency < this.fftSpec.filter.max;
     });
   }
 
-  private binFrequencies(fft: Uint8Array): Uint8Array {
+  private binFrequencies(fft: FftFrame): FftFrame {
     if (fft.length <= this.fftSpec.binCount) return fft;
     const binSize = fft.length / this.fftSpec.binCount;
     // generate indexes to split bins on
