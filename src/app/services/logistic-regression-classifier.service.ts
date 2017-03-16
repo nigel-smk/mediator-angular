@@ -1,17 +1,15 @@
 import { Injectable } from '@angular/core';
-import {SpeakerStoreService} from "../stores/speaker-store.service";
-import {Speaker} from "../models/speaker.model";
-import {Observable, Subscription, ConnectableObservable, BehaviorSubject} from "rxjs";
-import {LogRegClassification} from "../models/LogisticRegressionClassification.model";
-import {FftStreamService, FftFrameStream} from "./fft-stream.service";
+import {Subscription, ConnectableObservable} from "rxjs";
+import {FftFrameStream} from "./fft-stream.service";
 
 import 'rxjs/add/operator/sampleTime';
 import {FftFrame} from "../models/fftFrame.model";
+import {LogRegClassification} from "../models/logistic-regression-classification.model";
 
 // js ml library in assets
 declare var ml: any;
 
-// TODO figure out how to set interval dynamically using a switchMap
+// TODO include in spec
 const INTERVAL = 33; // ~30fps
 
 @Injectable()
@@ -22,26 +20,26 @@ export class LogisticRegressionClassifierService {
   constructor() { }
 
   private createClassificationStream(fftFrameStream: FftFrameStream, interval: number) {
-    return new FftFrameStream(fftFrameStream);
+    return new ClassificationStream(fftFrameStream, interval);
   }
 
-  getPrivateFftFrameStream(analyserNode$: Observable<AnalyserNode>) {
-    return this.createFftFrameStream(analyserNode$);
+  getPrivateFftFrameStream(fftFrameStream: FftFrameStream, interval: number) {
+    return this.createClassificationStream(fftFrameStream, interval);
   }
 
   /**
    * Get public classification stream. First call must provide a mediaStream to initialise against.
    * */
   // TODO come up with a better singleton pattern
-  getPublicFftFrameStream(analyserNode$?: Observable<AnalyserNode>, interval?: number) {
-    if (analyserNode$ || (analyserNode$ && !this.publicFftStream$)) {
-      this.publicFftStream$ = this.createFftFrameStream(analyserNode$, fftSpec);
+  getPublicFftFrameStream(fftFrameStream: FftFrameStream, interval?: number) {
+    if (fftFrameStream || (fftFrameStream && !this.publicClassificationStream)) {
+      this.publicClassificationStream = this.createClassificationStream(fftFrameStream, interval);
     }
-    else if (!analyserNode$ && !this.publicFftStream$) {
-      throw new Error('First call to getPublicFftFrameStream() must pass an Observable<MediaStream>');
+    else if (!fftFrameStream && !this.publicClassificationStream) {
+      throw new Error('First call to getPublicClassificationStream() must pass an FftFrameStream');
     }
 
-    return this.publicFftStream$;
+    return this.publicClassificationStream;
   }
 
 }
