@@ -12,5 +12,10 @@
   </div>
   <div class="row">
     <button type="button" class="mx-auto" (click)="trainModel()">Train Model</button>
+    <button type="button" class="mx-auto" (click)="startClassification()">Start</button>
+    <button type="button" class="mx-auto" (click)="stopClassification()">Stop</button>
+  </div>
+  <div class="row">
+    {{ classification$ | async | json }}
   </div>
 </section>

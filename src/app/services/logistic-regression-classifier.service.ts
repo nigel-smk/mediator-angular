@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {SpeakerStoreService} from "../stores/speaker-store.service";
 import {Speaker} from "../models/speaker.model";
-import {Observable, Subscription, ConnectableObservable} from "rxjs";
+import {Observable, Subscription, ConnectableObservable, BehaviorSubject} from "rxjs";
 import {LogisticRegressionClassification} from "../models/LogisticRegressionClassification.model";
 import {FftStreamService} from "./fft-stream.service";
 
@@ -17,12 +17,19 @@ const INTERVAL = 33; // ~30fps
 export class LogisticRegressionClassifierService {
 
   private speakers: Speaker[] = [];
-  private classification$: ConnectableObservable<LogisticRegressionClassification>;
+  private sourceSwitch: BehaviorSubject<Observable<any>> =
+    new BehaviorSubject<Observable<any>>(Observable.never());
+  private classification$: ConnectableObservable<any> =
+    this.sourceSwitch.switchMap((obs => obs)).publish();
   private connection: Subscription;
 
   constructor(private speakerStore: SpeakerStoreService, private fftStreamService: FftStreamService) {
     // TODO init in app.component?
     this.init();
+  }
+
+  get classification() {
+    return this.classification$;
   }
 
   public init() {
@@ -43,18 +50,19 @@ export class LogisticRegressionClassifierService {
   }
 
   public createClassifier() {
-    this.classification$ = this.fftStreamService.fft
+    let classificationStream = this.fftStreamService.fft
       .sampleTime(INTERVAL)
       .map((analyserFrame) => {
         let result = {};
         this.speakers.forEach((speaker) => {
           // TODO use a generated speaker id instead of name
-          result[speaker.name] = speaker.classifier.predict(analyserFrame);
+          result[speaker.name] = speaker.classifier.predict([analyserFrame]);
         });
 
         return result;
-      })
-      .publish();
+      });
+
+    this.sourceSwitch.next(classificationStream);
   }
 
   public train() {

@@ -6,6 +6,7 @@ import {AnalyserService} from "../../services/analyser.service";
 import {FftStreamService} from "../../services/fft-stream.service";
 import {Observable, Subscription} from "rxjs";
 import {LogisticRegressionClassifierService} from "../../services/logistic-regression-classifier.service";
+import {LogisticRegressionClassification} from "../../models/LogisticRegressionClassification.model";
 
 @Component({
   selector: 'app-home',
@@ -17,6 +18,7 @@ export class HomeComponent implements OnInit{
 
   public speakers: Speaker[] = new Array<Speaker>();
   private analyser: AnalyserNode;
+  private classification$: Observable<any>;
   private fft$: Subscription;
   //private audioCtx: AudioContext;
 
@@ -53,6 +55,14 @@ export class HomeComponent implements OnInit{
     this.classificationService.train();
   }
 
+  startClassification() {
+    this.classificationService.start();
+  }
+
+  stopClassification() {
+    this.classificationService.stop();
+  }
+
   ngOnInit() {
     this.speakerStore.speakers.subscribe((speakers: Speaker[]) => this.speakers = speakers);
     this.speakerStore.fetchSpeakers();
@@ -61,6 +71,8 @@ export class HomeComponent implements OnInit{
       this.analyser = analyser;
       this.speakers[0].analyser = this.analyser; // attach analyser to first speaker
     });
+
+    this.classification$ = this.classificationService.classification;
 
     this.userMedia.fetchStream({ audio: true }); // request user permission to access mic;
   }

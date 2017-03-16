@@ -15,7 +15,7 @@ export class FftStreamService {
   private fft$: ConnectableObservable<Uint8Array> = this.sourceSwitch$.switchMap((obs) => obs).publish();
   private fftConnection: Subscription;
   // TODO create streamSpec model
-  private streamSpec: {binCount: number, filter: {min: number, max: number}} = {binCount: 10, filter: {min: 50, max: 3000}};
+  private streamSpec: {binCount: number, filter: {min: number, max: number}} = {binCount: 100, filter: {min: 50, max: 3000}};
 
   // TODO this is connecting to the global AnalyserService Instance. Trouble?
   // Maybe the analyser just shouldn't get created in a service.
