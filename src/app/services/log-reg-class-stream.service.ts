@@ -13,40 +13,19 @@ declare var ml: any;
 const INTERVAL = 33; // ~30fps
 
 @Injectable()
-export class LogisticRegressionClassifierService {
-
-  private publicClassificationStream: ClassificationStream;
+export class LogRegClassStreamService {
 
   constructor() { }
 
-  private createClassificationStream(fftFrameStream: FftFrameStream, interval: number) {
-    return new ClassificationStream(fftFrameStream, interval);
-  }
-
-  getPrivateFftFrameStream(fftFrameStream: FftFrameStream, interval: number) {
-    return this.createClassificationStream(fftFrameStream, interval);
-  }
-
-  /**
-   * Get public classification stream. First call must provide a mediaStream to initialise against.
-   * */
-  // TODO come up with a better singleton pattern
-  getPublicFftFrameStream(fftFrameStream: FftFrameStream, interval?: number) {
-    if (fftFrameStream || (fftFrameStream && !this.publicClassificationStream)) {
-      this.publicClassificationStream = this.createClassificationStream(fftFrameStream, interval);
-    }
-    else if (!fftFrameStream && !this.publicClassificationStream) {
-      throw new Error('First call to getPublicClassificationStream() must pass an FftFrameStream');
-    }
-
-    return this.publicClassificationStream;
+  create(fftFrameStream: FftFrameStream, interval: number) {
+    return new LogRegClassStream(fftFrameStream, interval);
   }
 
 }
 
-export class ClassificationStream {
+export class LogRegClassStream {
 
-  private classification$: ConnectableObservable<LogRegClassification>;
+  public classification$: ConnectableObservable<LogRegClassification>;
   private classifier: any;
   private connection: Subscription;
 
@@ -54,7 +33,6 @@ export class ClassificationStream {
     this.classification$ = fftFrameStream.fftFrame$
       .sampleTime(interval)
       .map((fftFrame: FftFrame) => {
-        // TODO return classification frame
         return this.classifier.predict([fftFrame]);
       })
       .publish();
@@ -65,12 +43,19 @@ export class ClassificationStream {
       console.error(new Error('Classifier needs to be trained.'));
       return;
     }
-    this.connection = this.classification$.connect();
+    if (!this.connection) {
+      this.fftFrameStream.start();
+      this.connection = this.classification$.connect();
+    }
+
   }
 
   public stop() {
-    // TODO no connection error
-    this.connection.unsubscribe();
+    if (this.connection) {
+      this.fftFrameStream.stop();
+      this.connection.unsubscribe();
+      this.connection = undefined;
+    }
   }
 
   public train(trainingData: FftFrame[], labelVector: number[][]) {

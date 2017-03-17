@@ -11,13 +11,14 @@ import {Speaker} from "../../models/speaker.model";
       <div class="card-block">
         <h4 class="card-title">{{speaker.name}}</h4>
         <span class="record" (mousedown)="startCapture(speaker, $event)" (mouseup)="stopCapture(speaker, $event)" ></span>
+        <span>{{ speaker.logRegClassStream.classification$ | async | json }}</span>
       </div>
     </div>`,
   styleUrls: ['./speaker-card.component.css']
 })
 export class SpeakerCardComponent implements OnInit {
 
-  @Input() speaker: {name: string}[];
+  @Input() speaker: Speaker;
   @Output() recordPress: EventEmitter<Speaker> = new EventEmitter();
   @Output() recordRelease: EventEmitter<Speaker> = new EventEmitter();
 

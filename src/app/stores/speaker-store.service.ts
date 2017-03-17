@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {ReplaySubject} from "rxjs";
 import {Speaker} from "../models/speaker.model";
+import {LogRegClassStreamService} from "../services/log-reg-class-stream.service";
 
 @Injectable()
 export class SpeakerStoreService {
@@ -12,8 +13,9 @@ export class SpeakerStoreService {
 
   constructor() {
     // mock speakers
-    this._speakers.push({name: 'Nigel'});
-    this._speakers.push({name: 'Loisel'});}
+    // this._speakers.push({name: 'Nigel'});
+    // this._speakers.push({name: 'Loisel'});
+  }
 
   get speakers() {
     return this.speakers$.asObservable();

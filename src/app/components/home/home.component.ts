@@ -1,32 +1,33 @@
 import {Component, OnInit} from '@angular/core';
 import {Speaker} from "../../models/speaker.model";
-import {UserMediaService} from "../../services/user-media.service";
+import {MediaStreamStreamService} from "../../services/media-stream-stream.service";
 import {SpeakerStoreService} from "../../stores/speaker-store.service";
-import {AnalyserService} from "../../services/analyser.service";
-import {FftStreamService} from "../../services/fft-stream.service";
+import {AnalyserNodeStreamService} from "../../services/analyser-node-stream.service";
+import {FftStreamService, FftFrameStream} from "../../services/fft-stream.service";
 import {Observable, Subscription} from "rxjs";
-import {LogisticRegressionClassifierService} from "../../services/logistic-regression-classifier.service";
-import {LogRegClassification} from "../../models/LogisticRegressionClassification.model";
+import {LogRegClassStreamService} from "../../services/log-reg-class-stream.service";
+import {FftSpec} from "../../models/fftSpec.model";
+import {FftFrame} from "../../models/fftFrame.model";
+import {LogRegTrainerService} from "../../services/log-reg-trainer.service";
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css'],
-  providers: [AnalyserService, FftStreamService, LogisticRegressionClassifierService]
+  styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit{
 
   public speakers: Speaker[] = new Array<Speaker>();
   private analyser: AnalyserNode;
-  private classification$: Observable<any>;
-  private fft$: Subscription;
-  //private audioCtx: AudioContext;
+  private fftFrameStream: FftFrameStream;
+  private voiceSampleSubscription: Subscription;
 
-  constructor(private userMedia: UserMediaService,
-              private analyserService: AnalyserService,
-              private fftStream: FftStreamService,
+  constructor(private mediaStreamStream: MediaStreamStreamService,
+              private analyserNodeStream: AnalyserNodeStreamService,
+              private fftFrameStreamFactory: FftStreamService,
               private speakerStore: SpeakerStoreService,
-              private classificationService: LogisticRegressionClassifierService
+              private logRegClassStreamFactory: LogRegClassStreamService,
+              private logRegTrainer: LogRegTrainerService
   ) { }
 
   setActive(speaker: Speaker) {
@@ -37,44 +38,59 @@ export class HomeComponent implements OnInit{
   }
 
   onRecordPress(speaker: Speaker) {
-    speaker.analyserFrames = [];
-    this.fft$ = this.fftStream.fft.subscribe((fftResult: Uint8Array) => {
-      speaker.analyserFrames.push(fftResult);
+    speaker.voiceSample = [];
+    this.voiceSampleSubscription = this.fftFrameStream.fftFrame$.subscribe((fftFrame: FftFrame) => {
+      speaker.voiceSample.push(fftFrame);
       // TODO implement ~10 second limit for frames
     });
-    this.fftStream.start();
+    this.fftFrameStream.start();
   }
 
   onRecordRelease(speaker: Speaker) {
-    this.fft$.unsubscribe();
-    this.fftStream.stop();
-    console.log(speaker.analyserFrames);
+    this.voiceSampleSubscription.unsubscribe();
+    this.fftFrameStream.stop();
+    console.log(speaker.voiceSample);
   }
 
   trainModel() {
-    this.classificationService.train();
+    this.logRegTrainer.train(this.speakers);
   }
 
   startClassification() {
-    this.classificationService.start();
+    this.speakers.forEach((speaker) => {
+      speaker.logRegClassStream.start();
+    });
   }
 
   stopClassification() {
-    this.classificationService.stop();
+    this.speakers.forEach((speaker) => {
+      speaker.logRegClassStream.stop();
+    });
   }
 
   ngOnInit() {
+    // fetch speakers
     this.speakerStore.speakers.subscribe((speakers: Speaker[]) => this.speakers = speakers);
     this.speakerStore.fetchSpeakers();
 
-    this.analyserService.analyser.subscribe((analyser) => {
+    // create the fftFrame stream for the training and testing
+    this.fftFrameStream = this.fftFrameStreamFactory.create({
+      binCount: 100,
+      interval: 100,
+      filter: { min: 50, max: 3000 }
+    } as FftSpec);
+
+    // create test users
+    this.speakerStore.createSpeaker(new Speaker('Nigel', null, this.logRegClassStreamFactory.create(this.fftFrameStream, 33)));
+    this.speakerStore.createSpeaker(new Speaker('Anton', null, this.logRegClassStreamFactory.create(this.fftFrameStream, 33)));
+
+
+    this.analyserNodeStream.createAnalyserNodeStream().subscribe((analyser) => {
       this.analyser = analyser;
       this.speakers[0].analyser = this.analyser; // attach analyser to first speaker
     });
 
-    this.classification$ = this.classificationService.classification;
-
-    this.userMedia.fetchStream({ audio: true }); // request user permission to access mic;
+    this.mediaStreamStream.fetchMediaStream({ audio: true }); // request user permission to access mic;
   }
 
 }

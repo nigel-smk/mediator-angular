@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {ReplaySubject, BehaviorSubject, Observable} from "rxjs";
 
 @Injectable()
-export class UserMediaService {
+export class MediaStreamStreamService {
 
 
   private sourceSwitch$ = new BehaviorSubject<Observable<MediaStream>>(Observable.never()); // initialise fft stream to never observable
@@ -17,9 +17,9 @@ export class UserMediaService {
     return this.mediaStream$
   }
 
-  public fetchStream(constraints: MediaStreamConstraints) {
+  public fetchMediaStream(constraints: MediaStreamConstraints) {
     navigator.mediaDevices.getUserMedia(constraints)
-      .then((mediaStream: MediaStream) => this.sourceSwitch$.next(Observable.of(mediaStream)))
+      .then((mediaStream: MediaStream) => this.sourceSwitch$.next(new BehaviorSubject(mediaStream)))
       .catch((err) => console.log(err));
   }
 

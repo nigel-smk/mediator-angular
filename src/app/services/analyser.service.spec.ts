@@ -1,7 +1,7 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { AnalyserService } from './analyser.service';
 
-describe('AnalyserService', () => {
+describe('AnalyserNodeStreamService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [AnalyserService]
