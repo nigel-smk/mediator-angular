@@ -16,6 +16,7 @@ import {AnalyserNodeStreamService} from "./services/analyser-node-stream.service
 import {FftStreamService} from "./services/fft-stream.service";
 import {LogRegClassStreamService} from "./services/log-reg-class-stream.service";
 import {LogRegTrainerService} from "./services/log-reg-trainer.service";
+import { SpectrogramComponent } from './components/spectrogram/spectrogram.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import {LogRegTrainerService} from "./services/log-reg-trainer.service";
     AddSpeakerCardComponent,
     FftSpecComponent,
     FloaterButtonComponent,
-    HomeComponent
+    HomeComponent,
+    SpectrogramComponent
   ],
   imports: [
     BrowserModule,

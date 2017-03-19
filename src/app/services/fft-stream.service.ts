@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import {Observable, ConnectableObservable, Subscription} from "rxjs";
+import {Observable, ConnectableObservable, Subscription, BehaviorSubject} from "rxjs";
 import {FftSpec} from "../models/fftSpec.model";
 import {FftFrame} from "../models/fftFrame.model";
 import {AnalyserNodeStreamService} from "./analyser-node-stream.service";
-
 
 const SAMPLE_RATE = 44100;
 
@@ -20,12 +19,16 @@ export class FftStreamService {
 
 export class FftFrameStream {
 
-  public fftFrame$: ConnectableObservable<FftFrame>;
+  private sourceSwitch: BehaviorSubject<Observable<FftFrame>> = new BehaviorSubject(Observable.never());
+  public fftFrame$: ConnectableObservable<FftFrame> = this.sourceSwitch.switchMap(obs => {
+    return obs;
+  }).publish();
+  private liveFftFrame$: Observable<FftFrame>;
   private analyser: AnalyserNode;
   private connection: Subscription;
 
   constructor(private analyserNode$: Observable<AnalyserNode>, private fftSpec: FftSpec) {
-    this.fftFrame$ = analyserNode$.switchMap((analyser: AnalyserNode) => {
+    this.liveFftFrame$ = analyserNode$.switchMap((analyser: AnalyserNode) => {
       this.analyser = analyser;
       let fftFrame = new Uint8Array(analyser.frequencyBinCount);
       return Observable
@@ -34,15 +37,40 @@ export class FftFrameStream {
           analyser.getByteFrequencyData(fftFrame);
           return this.binFrequencies(this.filterFrequencies(fftFrame)); // return copy of fftFrame for this interval
         });
-    }).publish();
+    });
+
+    this.sourceSwitch.next(this.liveFftFrame$);
+  }
+
+  feed(frames: FftFrame[]) {
+    let feedFftFrame$ = Observable.from(frames)
+      .do(
+      // TODO try passing just the onCompleted function named as such and see if onNext and onError can be removed.
+      function onNext() {console.log("next feedFrame")},
+      function onError() {console.error("feedFrame error")},
+      function onCompleted() {
+        console.log("completed");
+        this.sourceSwitch.next(this.liveFftFrame$);
+      }
+    );
+
+    this.sourceSwitch.next(feedFftFrame$);
+  }
+
+  live() {
+    this.sourceSwitch.next(this.liveFftFrame$);
   }
 
   start() {
-    this.connection = this.fftFrame$.connect();
+    if (!this.connection) this.connection = this.fftFrame$.connect();
   }
 
   stop() {
-    this.connection.unsubscribe();
+    if (this.connection) {
+      this.connection.unsubscribe();
+      this.connection = undefined;
+    }
+
   }
 
   private filterFrequencies(fft: FftFrame): FftFrame {

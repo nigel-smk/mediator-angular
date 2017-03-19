@@ -16,6 +16,6 @@
     <button type="button" class="mx-auto" (click)="stopClassification()">Stop</button>
   </div>
   <div class="row">
-    {{ classification$ | async | json }}
+    <app-spectrogram [analyserNodeFeed]="analyserNode$"></app-spectrogram>
   </div>
 </section>

@@ -20,6 +20,7 @@ export class HomeComponent implements OnInit{
   public speakers: Speaker[] = new Array<Speaker>();
   private analyser: AnalyserNode;
   private fftFrameStream: FftFrameStream;
+  private analyserNode$: Observable<AnalyserNode>;
   private voiceSampleSubscription: Subscription;
 
   constructor(private mediaStreamStream: MediaStreamStreamService,
@@ -65,6 +66,7 @@ export class HomeComponent implements OnInit{
   stopClassification() {
     this.speakers.forEach((speaker) => {
       speaker.logRegClassStream.stop();
+      speaker.logRegClassStream.fftFrameStream.live();
     });
   }
 
@@ -85,7 +87,10 @@ export class HomeComponent implements OnInit{
     this.speakerStore.createSpeaker(new Speaker('Anton', null, this.logRegClassStreamFactory.create(this.fftFrameStream, 33)));
 
 
-    this.analyserNodeStream.createAnalyserNodeStream().subscribe((analyser) => {
+    this.analyserNode$ = this.analyserNodeStream.createAnalyserNodeStream();
+
+    //old code for liveFft
+    this.analyserNode$.subscribe((analyser) => {
       this.analyser = analyser;
       this.speakers[0].analyser = this.analyser; // attach analyser to first speaker
     });

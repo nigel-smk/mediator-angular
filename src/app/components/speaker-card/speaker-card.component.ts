@@ -11,6 +11,7 @@ import {Speaker} from "../../models/speaker.model";
       <div class="card-block">
         <h4 class="card-title">{{speaker.name}}</h4>
         <span class="record" (mousedown)="startCapture(speaker, $event)" (mouseup)="stopCapture(speaker, $event)" ></span>
+        <span><button type="button" (click)="test()">Test</button></span>
         <span>{{ speaker.logRegClassStream.classification$ | async | json }}</span>
       </div>
     </div>`,
@@ -28,6 +29,10 @@ export class SpeakerCardComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  test() {
+    this.speaker.logRegClassStream.fftFrameStream.feed(this.speaker.voiceSample);
   }
 
   startCapture(speaker: Speaker, event: Event) {

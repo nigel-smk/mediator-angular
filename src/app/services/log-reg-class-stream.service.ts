@@ -29,7 +29,7 @@ export class LogRegClassStream {
   private classifier: any;
   private connection: Subscription;
 
-  constructor(private fftFrameStream: FftFrameStream, interval: number) {
+  constructor(public fftFrameStream: FftFrameStream, interval: number) {
     this.classification$ = fftFrameStream.fftFrame$
       .sampleTime(interval)
       .map((fftFrame: FftFrame) => {

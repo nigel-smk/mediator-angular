@@ -22,7 +22,9 @@
         "styles.css"
       ],
       "scripts": [
-        "./assets/machine_learning.min.js"
+        "./assets/machine_learning.min.js",
+        "./assets/spectrogram.js",
+        "../node_modules/spectrogram/spectrogram.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {

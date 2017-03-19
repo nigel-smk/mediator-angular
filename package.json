@@ -29,6 +29,7 @@
     "@angular/router": "^3.4.0",
     "@ng-bootstrap/ng-bootstrap": "^1.0.0-alpha.20",
     "@types/webrtc": "0.0.21",
+    "chroma-js": "^1.2.2",
     "core-js": "^2.4.1",
     "express": "^4.14.1",
     "install": "^0.8.7",
@@ -36,6 +37,7 @@
     "npm": "^4.3.0",
     "octicons": "^5.0.1",
     "rxjs": "^5.1.0",
+    "spectrogram": "0.0.3",
     "zone.js": "^0.7.6"
   },
   "devDependencies": {
