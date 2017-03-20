@@ -1,21 +1,31 @@
 <section id="speakers" class="container">
   <div class="row">
-    <div class="row mx-auto">
-      <app-speaker-card
-        [speaker]=speaker
-        (click)="setActive(speaker)"
-        (recordPress)="onRecordPress(speaker)"
-        (recordRelease)="onRecordRelease(speaker)"
-        *ngFor="let speaker of speakers; trackBy:speaker?.name"
-      ></app-speaker-card>
+    <div class="col-3">
+      <app-fft-spec [analyser]="analyser"></app-fft-spec>
     </div>
-  </div>
-  <div class="row">
-    <button type="button" class="mx-auto" (click)="trainModel()">Train Model</button>
-    <button type="button" class="mx-auto" (click)="startClassification()">Start</button>
-    <button type="button" class="mx-auto" (click)="stopClassification()">Stop</button>
-  </div>
-  <div class="row">
-    <app-spectrogram [analyserNodeFeed]="analyserNode$"></app-spectrogram>
+    <div class="col-9">
+      <div class="row">
+        <div class="row mx-auto">
+          <app-speaker-card
+            [speaker]=speaker
+            (click)="setActive(speaker)"
+            (recordPress)="onRecordPress(speaker)"
+            (recordRelease)="onRecordRelease(speaker)"
+            *ngFor="let speaker of speakers; trackBy:speaker?.name"
+          ></app-speaker-card>
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" class="mx-auto" (click)="trainModel()">Train Model</button>
+        <button type="button" class="mx-auto" (click)="startClassification()">Start</button>
+        <button type="button" class="mx-auto" (click)="stopClassification()">Stop</button>
+      </div>
+      <div class="row">
+        <app-equalizer [analyser]="analyser"></app-equalizer>
+      </div>
+      <div class="row">
+        <app-spectrogram [analyserNodeFeed]="analyserNode$"></app-spectrogram>
+      </div>
+    </div>
   </div>
 </section>

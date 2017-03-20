@@ -8,7 +8,7 @@ import { SpeakerCardComponent } from './components/speaker-card/speaker-card.com
 import { EqualizerComponent } from './components/equalizer/equalizer.component';
 import {MediaStreamStreamService} from "./services/media-stream-stream.service";
 import { AddSpeakerCardComponent } from './components/add-speaker-card/add-speaker-card.component';
-import { FftSpecComponent } from './components/equalizer/fft-spec/fft-spec.component';
+import { FftSpecComponent } from './components/fft-spec/fft-spec.component';
 import { FloaterButtonComponent } from './components/equalizer/floater-button/floater-button.component';
 import { HomeComponent } from './components/home/home.component';
 import {SpeakerStoreService} from "./stores/speaker-store.service";

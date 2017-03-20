@@ -1,6 +1,4 @@
 export interface AnalyserSpec {
-  minBin?: number;
-  maxBin?: number;
   filter?: AnalyserSpecFilter;
 }
 

@@ -1,16 +1,15 @@
-import {Component, AfterViewInit, ViewChild, Input, OnInit, Output, EventEmitter} from '@angular/core';
-import {FilterSpec} from "../../../models/filterSpec.model";
-import {AnalyserSpec, AnalyserSpecFilter} from "../../../models/analyserSpec.model";
+import {Component, ViewChild, Input, OnInit, Output, EventEmitter} from '@angular/core';
+import {FilterSpec} from "../../models/filterSpec.model";
+import {AnalyserSpec, AnalyserSpecFilter} from "../../models/analyserSpec.model";
 
 @Component({
   selector: 'app-fft-spec',
-  templateUrl: './fft-spec.component.html',
-  styleUrls: ['./fft-spec.component.css']
+  templateUrl: 'fft-spec.component.html',
+  styleUrls: ['fft-spec.component.css']
 })
 export class FftSpecComponent implements OnInit {
   private filter: AnalyserSpecFilter = {};
 
-  @ViewChild('eq') eqCanvas;
   @Input() analyser: AnalyserNode;
   @Input() analyserSpec: AnalyserSpec;
   @Output() onFilterSet = new EventEmitter<FilterSpec>();

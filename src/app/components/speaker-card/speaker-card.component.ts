@@ -5,9 +5,6 @@ import {Speaker} from "../../models/speaker.model";
   selector: 'app-speaker-card',
   template: `
     <div class="card mx-auto">
-      <div class="equalizer card-block">
-        <app-equalizer [analyser]="speaker.analyser"></app-equalizer>
-      </div>
       <div class="card-block">
         <h4 class="card-title">{{speaker.name}}</h4>
         <span class="record" (mousedown)="startCapture(speaker, $event)" (mouseup)="stopCapture(speaker, $event)" ></span>

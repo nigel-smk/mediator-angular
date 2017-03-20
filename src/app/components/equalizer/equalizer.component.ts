@@ -1,20 +1,16 @@
 import {Component, AfterViewInit, ViewChild, Input} from '@angular/core';
-import {FilterSpec} from "../../models/filterSpec.model";
 import {AnalyserSpec} from "../../models/analyserSpec.model";
-import {CssShape} from "./floater-button/floater-button.component";
 
 @Component({
   selector: 'app-equalizer',
-  templateUrl: './equalizer.component.html',
+  template: `<canvas id="eq" #eq></canvas>`,
   styleUrls: ['./equalizer.component.css']
 })
 export class EqualizerComponent implements AfterViewInit {
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
-  private uiState: {buttons: boolean, specs: boolean} = {buttons: false, specs: false};
   // TODO place analyserSpec properties directly on analysernode?
   private analyserSpec: AnalyserSpec = {filter: {min: 50, max: 3000}};
-  private buttonShape: CssShape = 'tri-down';
 
   @ViewChild('eq') eqCanvas;
   @Input() analyser: AnalyserNode;
@@ -26,23 +22,6 @@ export class EqualizerComponent implements AfterViewInit {
     this.context = this.canvas.getContext("2d");
 
     this.draw();
-  }
-
-  setFilter(filterInputs: FilterSpec) {
-    Object.assign(this.analyserSpec.filter, filterInputs);
-  }
-
-  onMouseEnter() {
-    this.uiState.buttons = true;
-  }
-
-  onMouseLeave() {
-    this.uiState.buttons = false;
-  }
-
-  toggleSpecs() {
-    this.uiState.specs = !this.uiState.specs;
-    this.buttonShape = this.uiState.specs ? 'tri-up' : 'tri-down';
   }
 
   draw() {
@@ -74,14 +53,11 @@ export class EqualizerComponent implements AfterViewInit {
       let bar_width = Math.ceil(this.canvas.width / bar_count);
       for (let i = 0; i < bar_count; i++) {
         let binValue = filtered_fbc_array[i];
-        // update maxBin/minBin
-        if (this.analyserSpec.maxBin === undefined || binValue > this.analyserSpec.maxBin) this.analyserSpec.maxBin = binValue;
-        if (this.analyserSpec.minBin === undefined || binValue < this.analyserSpec.minBin) this.analyserSpec.minBin = binValue;
         let bar_x = i * bar_width;
         //let bar_height = -(Math.floor(filtered_fbc_array[i]) - this.analyser.minDecibels);
         let bar_height = binValue;
 
-        ctx.fillRect(bar_x, this.canvas.height - bar_height, bar_width, bar_height);
+        ctx.fillRect(bar_x, (this.canvas.height - bar_height) / 2, bar_width, bar_height);
       }
     } else { // clear
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // clear canvas
