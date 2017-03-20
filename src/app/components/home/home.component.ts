@@ -49,6 +49,10 @@ export class HomeComponent implements OnInit{
   onRecordRelease(speaker: Speaker) {
     this.voiceSampleSubscription.unsubscribe();
     console.log(speaker.voiceSample);
+
+    // train the model
+    this.logRegTrainer.train(this.speakers);
+    this.startClassification();
   }
 
   trainModel() {
@@ -56,6 +60,7 @@ export class HomeComponent implements OnInit{
   }
 
   startClassification() {
+    if (this.speakers.filter((speaker) => speaker.voiceSample).length !== this.speakers.length) return;
     this.speakers.forEach((speaker) => {
       speaker.logRegClassStream.start();
     });
@@ -64,7 +69,6 @@ export class HomeComponent implements OnInit{
   stopClassification() {
     this.speakers.forEach((speaker) => {
       speaker.logRegClassStream.stop();
-      speaker.logRegClassStream.fftFrameStream.live();
     });
   }
 

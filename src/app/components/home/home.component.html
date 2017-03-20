@@ -16,12 +16,7 @@
         </div>
       </div>
       <div class="row">
-        <button type="button" class="mx-auto" (click)="trainModel()">Train Model</button>
-        <button type="button" class="mx-auto" (click)="startClassification()">Start</button>
-        <button type="button" class="mx-auto" (click)="stopClassification()">Stop</button>
-      </div>
-      <div class="row">
-        <app-spectrogram [analyserNodeFeed]="analyserNode$"></app-spectrogram>
+        <app-spectrogram [fftFrameStream]="fftFrameStream" [widthInSeconds]="20" [analyserNodeFeed]="analyserNode$"></app-spectrogram>
       </div>
       <div class="row">
         <app-equalizer [fftFrameStream]="fftFrameStream" ></app-equalizer>

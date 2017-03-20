@@ -12,6 +12,11 @@ export class LogRegTrainerService {
   public train(speakers: Speaker[]) {
     // TODO import a matrix
 
+    let sampledSpeakers = speakers.filter((speaker) => {
+      return speaker.voiceSample;
+    });
+    if (sampledSpeakers.length !== speakers.length) return;
+
     const label = {
       match: [1,0],
       noMatch: [0,1]

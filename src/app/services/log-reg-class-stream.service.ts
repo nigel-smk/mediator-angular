@@ -44,7 +44,6 @@ export class LogRegClassStream {
       return;
     }
     if (!this.connection) {
-      this.fftFrameStream.start();
       this.connection = this.classification$.connect();
     }
 
@@ -52,7 +51,6 @@ export class LogRegClassStream {
 
   public stop() {
     if (this.connection) {
-      this.fftFrameStream.stop();
       this.connection.unsubscribe();
       this.connection = undefined;
     }

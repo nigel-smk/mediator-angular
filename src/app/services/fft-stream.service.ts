@@ -26,6 +26,7 @@ export class FftFrameStream {
   private liveFftFrame$: Observable<FftFrame>;
   public analyser: AnalyserNode;
   private connection: Subscription;
+  private filteredBinCount: number;
 
   constructor(private analyserNode$: Observable<AnalyserNode>, private fftSpec: FftSpec) {
     this.liveFftFrame$ = analyserNode$.switchMap((analyser: AnalyserNode) => {
@@ -40,6 +41,14 @@ export class FftFrameStream {
     });
 
     this.sourceSwitch.next(this.liveFftFrame$);
+  }
+
+  get interval() {
+    return this.fftSpec.interval;
+  }
+
+  get binCount(): number {
+    return this.filteredBinCount || this.fftSpec.binCount;
   }
 
   feed(frames: FftFrame[]) {
@@ -80,10 +89,14 @@ export class FftFrameStream {
   }
 
   private filterFrequencies(fft: FftFrame): FftFrame {
-    return fft.filter((value: number, i: number) => {
+    let filtered = fft.filter((value: number, i: number) => {
       let binFrequency = i * SAMPLE_RATE / this.analyser.fftSize;
       return binFrequency > this.fftSpec.filter.min && binFrequency < this.fftSpec.filter.max;
     });
+
+    this.filteredBinCount = filtered.length;
+
+    return filtered;
   }
 
   private binFrequencies(fft: FftFrame): FftFrame {
