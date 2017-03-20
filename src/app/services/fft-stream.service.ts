@@ -24,7 +24,7 @@ export class FftFrameStream {
     return obs;
   }).publish();
   private liveFftFrame$: Observable<FftFrame>;
-  private analyser: AnalyserNode;
+  public analyser: AnalyserNode;
   private connection: Subscription;
 
   constructor(private analyserNode$: Observable<AnalyserNode>, private fftSpec: FftSpec) {
@@ -43,12 +43,18 @@ export class FftFrameStream {
   }
 
   feed(frames: FftFrame[]) {
-    let feedFftFrame$ = Observable.from(frames)
+    let service = this;
+
+    let feedFftFrame$ = Observable
+      .from(frames)
+      .zip(Observable.interval(this.fftSpec.interval))
+      .map((zipped: [FftFrame | number]) => {
+        return zipped[0];
+      })
       .do(
-      // TODO try passing just the onCompleted function named as such and see if onNext and onError can be removed.
-      function onNext() {console.log("next feedFrame")},
-      function onError() {console.error("feedFrame error")},
-      function onCompleted() {
+      () => {console.log("next feedFrame")},
+      () => {console.error("feedFrame error")},
+      () => {
         console.log("completed");
         this.sourceSwitch.next(this.liveFftFrame$);
       }

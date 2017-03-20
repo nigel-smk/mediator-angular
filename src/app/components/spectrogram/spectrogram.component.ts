@@ -1,5 +1,6 @@
 import {Component, OnInit, ViewChild, AfterViewInit, Input, OnDestroy} from '@angular/core';
 import {Subscription, Observable} from "rxjs";
+import {FftFrame} from "../../models/fftFrame.model";
 
 @Component({
   selector: 'app-spectrogram',
@@ -39,6 +40,10 @@ export class SpectrogramComponent implements AfterViewInit {
         spectro.connectSource(analyserNode, new AudioContext());
         spectro.start();
     });
+
+  }
+
+  draw(fftFrame: FftFrame) {
 
   }
 

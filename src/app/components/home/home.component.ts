@@ -44,12 +44,10 @@ export class HomeComponent implements OnInit{
       speaker.voiceSample.push(fftFrame);
       // TODO implement ~10 second limit for frames
     });
-    this.fftFrameStream.start();
   }
 
   onRecordRelease(speaker: Speaker) {
     this.voiceSampleSubscription.unsubscribe();
-    this.fftFrameStream.stop();
     console.log(speaker.voiceSample);
   }
 
@@ -77,10 +75,11 @@ export class HomeComponent implements OnInit{
 
     // create the fftFrame stream for the training and testing
     this.fftFrameStream = this.fftFrameStreamFactory.create({
-      binCount: 100,
-      interval: 100,
+      binCount: 1024,
+      interval: 16,
       filter: { min: 50, max: 3000 }
     } as FftSpec);
+    this.fftFrameStream.start();
 
     // create test users
     this.speakerStore.createSpeaker(new Speaker('Nigel', null, this.logRegClassStreamFactory.create(this.fftFrameStream, 33)));
