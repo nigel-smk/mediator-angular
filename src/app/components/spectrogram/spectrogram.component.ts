@@ -66,7 +66,7 @@ export class SpectrogramComponent implements AfterViewInit {
 
       // draw new frame on open
       fftFrame.forEach((value, i) => {
-        this.context.fillStyle = this.getColor(value);
+        this.context.fillStyle = this.getColor(value).toString();
         this.context.fillRect(width - 1, height - i, 1, 1);
       });
     });
