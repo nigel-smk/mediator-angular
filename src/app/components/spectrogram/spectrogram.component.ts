@@ -11,9 +11,6 @@ import {forEach} from "@angular/router/src/utils/collection";
 })
 export class SpectrogramComponent implements AfterViewInit {
 
-  private Spectrogram: any = require('../../../../node_modules/spectrogram/spectrogram.js');
-  private chroma: any = require('../../../../node_modules/chroma-js/chroma.js')
-
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
   private subscription: Subscription;
