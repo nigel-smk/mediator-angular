@@ -1,35 +1,38 @@
 import { Injectable } from '@angular/core';
-import {Observable, ConnectableObservable, Subscription, BehaviorSubject} from "rxjs";
+import {Observable, ConnectableObservable, Subscription, BehaviorSubject, Subject, ReplaySubject} from "rxjs";
 import {FftSpec} from "../models/fftSpec.model";
 import {FftFrame} from "../models/fftFrame.model";
-import {AnalyserNodeStreamService} from "./analyser-node-stream.service";
+import {AnalyserNodeFeed} from "./analyser-node-feed";
 
 const SAMPLE_RATE = 44100;
 
 @Injectable()
-export class FftStreamService {
-
-  constructor(private analyserNodeStream: AnalyserNodeStreamService) { }
-
-  create(fftSpec: FftSpec, analyserNode$: Observable<AnalyserNode> = this.analyserNodeStream.createAnalyserNodeStream()) {
-    return new FftFrameStream(analyserNode$, fftSpec);
-  }
-
-}
-
 export class FftFrameStream {
 
-  private sourceSwitch: BehaviorSubject<Observable<FftFrame>> = new BehaviorSubject(Observable.never());
-  public fftFrame$: ConnectableObservable<FftFrame> = this.sourceSwitch.switchMap(obs => {
-    return obs;
-  }).publish();
-  private liveFftFrame$: Observable<FftFrame>;
-  public analyser: AnalyserNode;
+  private pipe: Subject<AnalyserNode> = new Subject();
   private connection: Subscription;
+  private sourceSwitch$: ReplaySubject<Observable<FftFrame>> = new ReplaySubject(1);
+  // TODO is the switch operator more appropriate here?
+  public fftFrame$: Observable<FftFrame> = this.sourceSwitch$.switchMap(obs => obs).multicast(new Subject()).refCount();
+  private liveFftFrame$: Observable<FftFrame>;
+
+  private fftSpec: FftSpec;
+  public analyser: AnalyserNode;
   private filteredBinCount: number;
 
-  constructor(private analyserNode$: Observable<AnalyserNode>, private fftSpec: FftSpec) {
-    this.liveFftFrame$ = analyserNode$.switchMap((analyser: AnalyserNode) => {
+  constructor(private analyserNodeFeed: AnalyserNodeFeed) {
+    this.connection = analyserNodeFeed.$.subscribe(this.pipe);
+  }
+
+  get $() {
+    return this.fftFrame$;
+  }
+
+  public startSampling(fftSpec: FftSpec) {
+    // TODO set default filter and binCount. Only interval is required.
+    this.fftSpec = fftSpec;
+    // TODO if this is called multiple times will the old Observables stay in memory?
+    this.liveFftFrame$ = this.pipe.switchMap((analyser: AnalyserNode) => {
       this.analyser = analyser;
       let fftFrame = new Uint8Array(analyser.frequencyBinCount);
       return Observable
@@ -40,52 +43,26 @@ export class FftFrameStream {
         });
     });
 
-    this.sourceSwitch.next(this.liveFftFrame$);
-  }
-
-  get interval() {
-    return this.fftSpec.interval;
-  }
-
-  get binCount(): number {
-    return this.filteredBinCount || this.fftSpec.binCount;
+    this.sourceSwitch$.next(this.liveFftFrame$);
   }
 
   feed(frames: FftFrame[]) {
-    let service = this;
-
+    // TODO use a scheduler rather than .zip?
     let feedFftFrame$ = Observable
       .from(frames)
       .zip(Observable.interval(this.fftSpec.interval))
       .map((zipped: [FftFrame | number]) => {
         return zipped[0];
       })
-      .do(
-      () => {console.log("next feedFrame")},
-      () => {console.error("feedFrame error")},
-      () => {
-        console.log("completed");
-        this.sourceSwitch.next(this.liveFftFrame$);
+      .do({
+        complete: () => {
+            console.log("completed");
+            this.sourceSwitch$.next(this.liveFftFrame$);
+          }
       }
     );
 
-    this.sourceSwitch.next(feedFftFrame$);
-  }
-
-  live() {
-    this.sourceSwitch.next(this.liveFftFrame$);
-  }
-
-  start() {
-    if (!this.connection) this.connection = this.fftFrame$.connect();
-  }
-
-  stop() {
-    if (this.connection) {
-      this.connection.unsubscribe();
-      this.connection = undefined;
-    }
-
+    this.sourceSwitch$.next(feedFftFrame$);
   }
 
   private filterFrequencies(fft: FftFrame): FftFrame {
