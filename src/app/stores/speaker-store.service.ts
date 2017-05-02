@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import {ReplaySubject} from "rxjs";
 import {Speaker} from "../models/speaker.model";
-import {LogRegClassStreamService} from "../services/log-reg-class-stream.service";
 
 @Injectable()
 export class SpeakerStoreService {
