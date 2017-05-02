@@ -1,5 +1,9 @@
 import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
 import {Speaker} from "../../models/speaker.model";
+import {FftFrameStream} from "../../services/fft-frame-stream";
+import {Subscription} from "rxjs";
+import {FftFrame} from "../../models/fftFrame.model";
+import {LogRegClassStream} from "../../services/log-reg-class-stream";
 
 @Component({
   selector: 'app-speaker-card',
@@ -9,37 +13,48 @@ import {Speaker} from "../../models/speaker.model";
         <h4 class="card-title">{{speaker.name}}</h4>
         <span class="record" (mousedown)="startCapture(speaker, $event)" (mouseup)="stopCapture(speaker, $event)" ></span>
         <span><button type="button" (click)="test()">Test</button></span>
-        <span>{{ speaker.logRegClassStream.classification$ | async | json }}</span>
+        <span>{{ speaker.logRegClassStream?.$ | async | json }}</span>
       </div>
     </div>`,
-  styleUrls: ['./speaker-card.component.css']
+  styleUrls: ['./speaker-card.component.css'],
+  providers: [LogRegClassStream]
 })
 export class SpeakerCardComponent implements OnInit {
+
+  private voiceSampleSubscription: Subscription;
 
   @Input() speaker: Speaker;
   @Output() recordPress: EventEmitter<Speaker> = new EventEmitter();
   @Output() recordRelease: EventEmitter<Speaker> = new EventEmitter();
 
-  // TODO catch and stop propagation of click event?
-
-  constructor() {
+  constructor(private fftFrameStream: FftFrameStream, private logRegClassStream: LogRegClassStream) {
   }
 
   ngOnInit() {
+    this.speaker.logRegClassStream = this.logRegClassStream;
   }
 
   test() {
-    this.speaker.logRegClassStream.fftFrameStream.feed(this.speaker.voiceSample);
+    this.fftFrameStream.feed(this.speaker.voiceSample);
   }
 
   startCapture(speaker: Speaker, event: Event) {
     event.stopPropagation();
     this.recordPress.emit(speaker);
+
+    speaker.voiceSample = [];
+    this.voiceSampleSubscription = this.fftFrameStream.fftFrame$.subscribe((fftFrame: FftFrame) => {
+      speaker.voiceSample.push(fftFrame);
+      // TODO implement ~10 second limit for frames
+    });
   }
 
   stopCapture(speaker: Speaker, event: Event) {
     event.stopPropagation();
     this.recordRelease.emit(speaker);
+
+    this.voiceSampleSubscription.unsubscribe();
+    console.log(speaker.voiceSample);
   }
 
 }

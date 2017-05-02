@@ -1,8 +1,6 @@
-import {Component, OnInit, ViewChild, AfterViewInit, Input, OnDestroy} from '@angular/core';
-import {Subscription, Observable} from "rxjs";
+import {Component, ViewChild, AfterViewInit, Input} from '@angular/core';
 import {FftFrame} from "../../models/fftFrame.model";
-import {FftFrameStream} from "../../services/fft-stream.service";
-import {forEach} from "@angular/router/src/utils/collection";
+import {FftFrameStream} from "../../services/fft-frame-stream";
 
 @Component({
   selector: 'app-spectrogram',
@@ -13,10 +11,8 @@ export class SpectrogramComponent implements AfterViewInit {
 
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
-  private subscription: Subscription;
 
   @ViewChild('spectrogram') canvasElement;
-  @Input() analyserNodeFeed: Observable<AnalyserNode>;
 
 
   // TODO angular 2 way to create empty canvas element?
@@ -24,19 +20,18 @@ export class SpectrogramComponent implements AfterViewInit {
   private tempCanvasContext = this.tempCanvas.getContext('2d');
   private colors: number[] = this.generateColors(275);
 
-  @Input() fftFrameStream: FftFrameStream;
   @Input() widthInSeconds: number;
 
 
-  constructor() { }
+  constructor(private fftFrameStream: FftFrameStream) { }
 
   ngAfterViewInit() {
 
     this.canvas = this.canvasElement.nativeElement;
     this.context = this.canvas.getContext("2d");
 
-    this.canvas.width = this.widthInSeconds * (1000 / this.fftFrameStream.interval);
-    this.canvas.height = this.fftFrameStream.binCount;
+    this.canvas.width = this.widthInSeconds * (1000 / this.fftFrameStream.getSpec().interval);
+    this.canvas.height = this.fftFrameStream.getSpec().binCount;
 
     this.fftFrameStream.fftFrame$.subscribe((fftFrame: FftFrame) => {
       this.draw(fftFrame);
@@ -53,8 +48,8 @@ export class SpectrogramComponent implements AfterViewInit {
       this.tempCanvasContext.drawImage(this.canvas, 0, 0);
 
       // set canvas dimensions
-      this.canvas.width = this.widthInSeconds * (1000 / this.fftFrameStream.interval);
-      this.canvas.height = this.fftFrameStream.binCount;
+      this.canvas.width = this.widthInSeconds * (1000 / this.fftFrameStream.getSpec().interval);
+      this.canvas.height = this.fftFrameStream.getSpec().binCount;
       let width = this.canvas.width;
       let height = this.canvas.height;
 

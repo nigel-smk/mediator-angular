@@ -1,7 +1,7 @@
 import {Component, AfterViewInit, ViewChild, Input} from '@angular/core';
 import {AnalyserSpec} from "../../models/analyserSpec.model";
-import {FftFrameStream} from "../../services/fft-stream.service";
 import {FftFrame} from "../../models/fftFrame.model";
+import {FftFrameStream} from "../../services/fft-frame-stream";
 
 @Component({
   selector: 'app-equalizer',
@@ -15,15 +15,14 @@ export class EqualizerComponent implements AfterViewInit {
   private analyserSpec: AnalyserSpec = {filter: {min: 50, max: 3000}};
 
   @ViewChild('eq') eqCanvas;
-  @Input() fftFrameStream: FftFrameStream;
 
-  constructor() { }
+  constructor(private fftFrameStream: FftFrameStream) { }
 
   ngAfterViewInit() {
     this.canvas = this.eqCanvas.nativeElement;
     this.context = this.canvas.getContext("2d");
 
-    this.fftFrameStream.fftFrame$.subscribe((fftFrame: FftFrame) => {
+    this.fftFrameStream.$.subscribe((fftFrame: FftFrame) => {
       this.draw(fftFrame)
     })
   }

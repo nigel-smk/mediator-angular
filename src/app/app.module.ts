@@ -6,14 +6,10 @@ import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 import { SpeakerCardComponent } from './components/speaker-card/speaker-card.component';
 import { EqualizerComponent } from './components/equalizer/equalizer.component';
-import { MediaStreamStreamService } from "./services/media-stream-stream.service";
 import { FftSpecComponent } from './components/fft-spec/fft-spec.component';
 import { FloaterButtonComponent } from './components/equalizer/floater-button/floater-button.component';
 import { HomeComponent } from './components/home/home.component';
 import {SpeakerStoreService} from "./stores/speaker-store.service";
-import {AnalyserNodeStreamService} from "./services/analyser-node-stream.service";
-import {FftStreamService} from "./services/fft-stream.service";
-import {LogRegClassStreamService} from "./services/log-reg-class-stream.service";
 import {LogRegTrainerService} from "./services/log-reg-trainer.service";
 import { SpectrogramComponent } from './components/spectrogram/spectrogram.component';
 
@@ -33,11 +29,7 @@ import { SpectrogramComponent } from './components/spectrogram/spectrogram.compo
     HttpModule
   ],
   providers: [
-    MediaStreamStreamService,
     SpeakerStoreService,
-    AnalyserNodeStreamService,
-    FftStreamService,
-    LogRegClassStreamService,
     LogRegTrainerService
   ],
   bootstrap: [AppComponent]

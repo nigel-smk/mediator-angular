@@ -1,5 +1,5 @@
-import {LogRegClassStream} from "../services/log-reg-class-stream.service";
 import {FftFrame} from "./fftFrame.model";
+import {LogRegClassStream} from "../services/log-reg-class-stream";
 export class Speaker {
 
   constructor(

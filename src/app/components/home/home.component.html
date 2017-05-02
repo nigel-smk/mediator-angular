@@ -8,18 +8,16 @@
         <div class="row mx-auto">
           <app-speaker-card
             [speaker]=speaker
-            (click)="setActive(speaker)"
-            (recordPress)="onRecordPress(speaker)"
             (recordRelease)="onRecordRelease(speaker)"
             *ngFor="let speaker of speakers; trackBy:speaker?.name"
           ></app-speaker-card>
         </div>
       </div>
       <div class="row">
-        <app-spectrogram [fftFrameStream]="fftFrameStream" [widthInSeconds]="20" [analyserNodeFeed]="analyserNode$"></app-spectrogram>
+        <app-spectrogram [widthInSeconds]="20"></app-spectrogram>
       </div>
       <div class="row">
-        <app-equalizer [fftFrameStream]="fftFrameStream" ></app-equalizer>
+        <app-equalizer></app-equalizer>
       </div>
     </div>
   </div>

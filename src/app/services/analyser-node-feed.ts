@@ -5,6 +5,8 @@ import {MediaStreamFeed} from "./media-stream-feed";
 @Injectable()
 export class AnalyserNodeFeed implements OnDestroy{
 
+  //TODO wrap the analyserNode to make it's setters private. Changing settings should push a new analyserNode down the chain
+
   private analyserNode$: Observable<AnalyserNode>;
   private connection: Subscription;
 
