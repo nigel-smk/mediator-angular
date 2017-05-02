@@ -35,7 +35,7 @@ export class LogRegClassStream implements OnDestroy{
         // TODO why is the prediction in a nested array?
         let prediction = this.classifier.predict([fftFrame])[0];
         // TODO why is the result the reverse of what I expect?
-        return prediction[0] !== Math.max(...prediction);
+        return prediction[0] === Math.max(...prediction);
       })
       .distinctUntilChanged()
       .publish();
@@ -75,11 +75,15 @@ export class LogRegClassStream implements OnDestroy{
   }
 
   public train(trainingData: FftFrame[], labelVector: number[][]) {
+    let mean = trainingData.reduce((acc, val) => {
+      return acc + val.reduce((acc, val) => acc + val, 0);
+    }, 0);
 
     this.classifier = new ml.LogisticRegression({
       input: trainingData.map((frame: Uint8Array) => {
         return frame.map((value: number) => {
-          return value + this.spec.offset;
+          //return value + this.spec.offset;
+          return value - mean / 2;
         })
       }),
       label: labelVector,

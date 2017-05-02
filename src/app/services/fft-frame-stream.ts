@@ -1,8 +1,8 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {Observable, Subscription, Subject, ReplaySubject} from "rxjs";
-import {FftSpec} from "../models/fftSpec.model";
 import {FftFrame} from "../models/fftFrame.model";
 import {AnalyserNodeFeed} from "./analyser-node-feed";
+import {FftSpec} from "../models/fftSpec.model";
 
 const SAMPLE_RATE = 44100;
 
@@ -20,27 +20,13 @@ export class FftFrameStream implements OnDestroy {
   public analyser: AnalyserNode;
   private filteredBinCount: number;
   private spec: FftSpec = {
-    binCount: 1024,
     interval: 16,
+    binCount: null,
     filter: {
       min: 50,
       max: 3000
     }
   };
-
-  // TODO allow public access to spec but push observable with new spec to all subscribers on set of any property
-  // TODO for now users need to know that the spec can only be changed via setSpec()
-  // private spec: FftSpec = {
-  //   set interval(val: number) {
-  //     this.specSwitch$.next(this.createFftFrameObservable());
-  //   },
-  //   set binCount(val: number) {
-  //     this.specSwitch$.next(this.createFftFrameObservable());
-  //   },
-  //   set filter(val) {
-  //     this.specSwitch$.next(this.createFftFrameObservable());
-  //   }
-  // }
 
   constructor(private analyserNodeFeed: AnalyserNodeFeed) {
 
@@ -80,7 +66,7 @@ export class FftFrameStream implements OnDestroy {
 
   public setSpec(spec: FftSpec) {
     // TODO set default filter and binCount. Only interval is required.
-    this.spec = spec;
+    Object.assign(this.spec, spec);
     this.specSwitch$.next(this.createFftFrameObservable());
   }
 
@@ -134,6 +120,7 @@ export class FftFrameStream implements OnDestroy {
   }
 
   private binFrequencies(fft: FftFrame): FftFrame {
+    if (this.spec.binCount == null) return fft;
     if (fft.length <= this.spec.binCount) return fft;
     const binSize = fft.length / this.spec.binCount;
     // generate indexes to split bins on

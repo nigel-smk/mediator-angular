@@ -1,6 +1,7 @@
 import {Component, ViewChild, AfterViewInit, Input} from '@angular/core';
 import {FftFrame} from "../../models/fftFrame.model";
 import {FftFrameStream} from "../../services/fft-frame-stream";
+import {AnalyserNodeFeed} from "../../services/analyser-node-feed";
 
 @Component({
   selector: 'app-spectrogram',
@@ -30,9 +31,6 @@ export class SpectrogramComponent implements AfterViewInit {
     this.canvas = this.canvasElement.nativeElement;
     this.context = this.canvas.getContext("2d");
 
-    this.canvas.width = this.widthInSeconds * (1000 / this.fftFrameStream.getSpec().interval);
-    this.canvas.height = this.fftFrameStream.getSpec().binCount;
-
     this.fftFrameStream.fftFrame$.subscribe((fftFrame: FftFrame) => {
       this.draw(fftFrame);
     });
@@ -49,7 +47,7 @@ export class SpectrogramComponent implements AfterViewInit {
 
       // set canvas dimensions
       this.canvas.width = this.widthInSeconds * (1000 / this.fftFrameStream.getSpec().interval);
-      this.canvas.height = this.fftFrameStream.getSpec().binCount;
+      this.canvas.height = fftFrame.length;
       let width = this.canvas.width;
       let height = this.canvas.height;
 

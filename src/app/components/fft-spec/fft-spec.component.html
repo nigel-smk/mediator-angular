@@ -53,11 +53,11 @@
   </div>
   <div class="form-group">
     <label for="filterMin">Filter Min: </label>
-    <input id="filterMin" name="filterMin" type="text" class="form-control" [(ngModel)]="filter.min" value="{{ analyserSpec.filter.min }}" placeholder="{{ analyserSpec.filter.min }}">
+    <input id="filterMin" name="filterMin" type="text" class="form-control" [(ngModel)]="filter.min" value="{{ fftFrameStream.getSpec().filter.min }}" placeholder="{{ fftFrameStream.getSpec().filter.min }}">
   </div>
   <div class="form-group">
     <label for="filterMax">Filter Max: </label>
-    <input id="filterMax" name="filterMax" type="text" class="form-control" [(ngModel)]="filter.max" value="{{ analyserSpec.filter.max }}" placeholder="{{ analyserSpec.filter.max }}">
+    <input id="filterMax" name="filterMax" type="text" class="form-control" [(ngModel)]="filter.max" value="{{ fftFrameStream.getSpec().filter.max }}" placeholder="{{ fftFrameStream.getSpec().filter.max }}">
   </div>
   <button type="button" (click)="setFilter()">Set Filter</button>
 </form>
