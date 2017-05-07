@@ -7,21 +7,14 @@ import {LogRegClassStream} from "../../services/log-reg-class-stream";
 
 @Component({
   selector: 'app-speaker-card',
-  template: `
-    <div class="card mx-auto">
-      <div class="card-block">
-        <h4 class="card-title">{{speaker.name}}</h4>
-        <span class="record" (mousedown)="startCapture(speaker, $event)" (mouseup)="stopCapture(speaker, $event)" ></span>
-        <span><button type="button" (click)="test()">Test</button></span>
-        <span>{{ speaker.logRegClassStream?.$ | async | json }}</span>
-      </div>
-    </div>`,
+  templateUrl: './speaker-card.component.html',
   styleUrls: ['./speaker-card.component.css'],
   providers: [LogRegClassStream]
 })
 export class SpeakerCardComponent implements OnInit {
 
   private voiceSampleSubscription: Subscription;
+  private bool = true;
 
   @Input() speaker: Speaker;
   @Output() recordPress: EventEmitter<Speaker> = new EventEmitter();

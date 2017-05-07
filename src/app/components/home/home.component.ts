@@ -46,8 +46,8 @@ export class HomeComponent implements OnInit{
     this.speakerStore.fetchSpeakers();
 
     // create test users
-    this.speakerStore.createSpeaker(new Speaker('Nigel', null, null));
-    this.speakerStore.createSpeaker(new Speaker('Anton', null, null));
+    this.speakerStore.createSpeaker(new Speaker('Source A', null, null));
+    this.speakerStore.createSpeaker(new Speaker('Source B', null, null));
 
     // request user permission to access mic;
     this.mediaStreamFeed.getUserMedia({ audio: true });

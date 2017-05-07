@@ -1,0 +1,39 @@
+@media screen and (max-width: 480px) {
+  app-fft-spec {
+    display: none;
+  }
+}
+.main {
+  display: flex;
+  flex-direction: column;
+}
+
+#speakers {
+  display: flex;
+  flex-direction: row;
+}
+
+.speaker {
+  flex-grow: 1;
+}
+
+#fft-feedback {
+  display: flex;
+  flex-direction: row;
+
+  margin: 1em;
+}
+
+.fft-visualizations {
+  flex-grow: 1;
+
+  margin: 1em;
+}
+
+.spectrogram {
+  flex-grow: 1;
+}
+
+.equalizer {
+  flex-grow: 1;
+}
