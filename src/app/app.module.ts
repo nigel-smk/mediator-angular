@@ -12,6 +12,9 @@ import { HomeComponent } from './components/home/home.component';
 import {SpeakerStoreService} from "./stores/speaker-store.service";
 import {LogRegTrainerService} from "./services/log-reg-trainer.service";
 import { SpectrogramComponent } from './components/spectrogram/spectrogram.component';
+import { SampleDistributionComponent } from './components/sample-distribution/sample-distribution.component';
+import {D3Service} from "d3-ng2-service";
+import { HistogramComponent } from './components/sample-distribution/histogram/histogram.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +24,9 @@ import { SpectrogramComponent } from './components/spectrogram/spectrogram.compo
     FftSpecComponent,
     FloaterButtonComponent,
     HomeComponent,
-    SpectrogramComponent
+    SpectrogramComponent,
+    SampleDistributionComponent,
+    HistogramComponent
   ],
   imports: [
     BrowserModule,
@@ -30,7 +35,8 @@ import { SpectrogramComponent } from './components/spectrogram/spectrogram.compo
   ],
   providers: [
     SpeakerStoreService,
-    LogRegTrainerService
+    LogRegTrainerService,
+    D3Service
   ],
   bootstrap: [AppComponent]
 })
