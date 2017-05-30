@@ -1,14 +1,17 @@
-import {Component, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import {Component, OnInit, ViewChild, ViewEncapsulation, Input} from '@angular/core';
 import {D3Service, D3} from "d3-ng2-service";
+import {Speaker} from "../../../../models/speaker.model";
+import {FftFrame} from "../../../../models/fftFrame.model";
 
 @Component({
   selector: 'app-histogram',
-  templateUrl: './histogram.component.html',
-  styleUrls: ['./histogram.component.css'],
+  templateUrl: 'histogram.component.html',
+  styleUrls: ['histogram.component.css'],
   encapsulation: ViewEncapsulation.None
 })
 export class HistogramComponent implements OnInit {
 
+  @Input() speaker: Speaker;
   @ViewChild('histogram') histogram: any;
 
   private d3: D3;
@@ -26,7 +29,11 @@ export class HistogramComponent implements OnInit {
 
     let d3 = this.d3;
 
-    var data = d3.range(1000).map(d3.randomBates(10));
+    // var data = d3.range(1000).map(d3.randomBates(10));
+    let data = this.speaker.voiceSample.reduce((aggregate: number[], fftFrame: FftFrame) => {
+      return aggregate.concat(Array.from(fftFrame))
+    }, []);
+
 
     let formatCount = d3.format(",.0f");
 
@@ -37,11 +44,12 @@ export class HistogramComponent implements OnInit {
       g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     var x = d3.scaleLinear()
+      .domain([0, 255])
       .rangeRound([0, width]);
 
     var bins = d3.histogram()
       .domain(x.domain() as [number, number])
-      .thresholds(x.ticks(20))
+      .thresholds(x.ticks(13))
       (data);
 
     var y = d3.scaleLinear()

@@ -7,6 +7,7 @@ export class Speaker {
     public analyser?: AnalyserNode,
     public logRegClassStream?: LogRegClassStream,
     public voiceSample?: FftFrame[],
-    public labelVector?: number[][]
+    public labelVector?: number[][],
+    public threshold?: number
   ) {}
 }

@@ -1,9 +1,19 @@
-import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
+import {Component, OnInit, Input} from '@angular/core';
 import {Speaker} from "../../models/speaker.model";
 import {FftFrameStream} from "../../services/fft-frame-stream";
 import {Subscription} from "rxjs";
-import {FftFrame} from "../../models/fftFrame.model";
 import {LogRegClassStream} from "../../services/log-reg-class-stream";
+
+enum Phase {
+  capture,
+  histogram,
+  train,
+  predict
+}
+enum NavState {
+  disabled,
+  enabled
+}
 
 @Component({
   selector: 'app-speaker-card',
@@ -13,41 +23,55 @@ import {LogRegClassStream} from "../../services/log-reg-class-stream";
 })
 export class SpeakerCardComponent implements OnInit {
 
+  public PhaseEnum = Phase;
+  public NavStateEnum = NavState;
+
   private voiceSampleSubscription: Subscription;
-  private bool = true;
+  private currentPhase: Phase = Phase.capture;
+  private possiblePhase: Phase = Phase.capture;
+  private nextState: NavState = NavState.disabled;
+  private prevState: NavState = NavState.disabled;
 
   @Input() speaker: Speaker;
-  @Output() recordPress: EventEmitter<Speaker> = new EventEmitter();
-  @Output() recordRelease: EventEmitter<Speaker> = new EventEmitter();
 
   constructor(private fftFrameStream: FftFrameStream, private logRegClassStream: LogRegClassStream) {
   }
 
   ngOnInit() {
+    // TODO need a better way to assign the class stream to the speaker
     this.speaker.logRegClassStream = this.logRegClassStream;
+    this.logRegClassStream.setSpeaker(this.speaker);
   }
 
   test() {
     this.fftFrameStream.feed(this.speaker.voiceSample);
   }
 
-  startCapture(speaker: Speaker, event: Event) {
-    event.stopPropagation();
-    this.recordPress.emit(speaker);
-
-    speaker.voiceSample = [];
-    this.voiceSampleSubscription = this.fftFrameStream.fftFrame$.subscribe((fftFrame: FftFrame) => {
-      speaker.voiceSample.push(fftFrame);
-      // TODO implement ~10 second limit for frames
-    });
+  isNextNavDisabled() {
+    return this.currentPhase == this.possiblePhase;
+  }
+  isPrevNavDisabled() {
+    return this.currentPhase == 0;
   }
 
-  stopCapture(speaker: Speaker, event: Event) {
-    event.stopPropagation();
-    this.recordRelease.emit(speaker);
+  navNextPossible() {
+    if (this.currentPhase == this.possiblePhase && this.currentPhase < Object.keys(Phase).length / 2) {
+      this.possiblePhase += 1;
+    }
+  }
 
-    this.voiceSampleSubscription.unsubscribe();
-    console.log(speaker.voiceSample);
+  navNext() {
+    // TODO hacky http://stackoverflow.com/questions/38034673/determine-the-number-of-enum-elements-typescript
+    if (this.currentPhase < Object.keys(Phase).length / 2) {
+      this.currentPhase += 1;
+      this.possiblePhase = this.currentPhase;
+    }
+  }
+
+  navPrev() {
+    if (this.currentPhase > 0) {
+      this.currentPhase -= 1;
+    }
   }
 
 }

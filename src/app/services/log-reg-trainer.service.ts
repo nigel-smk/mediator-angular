@@ -1,16 +1,33 @@
 import { Injectable } from '@angular/core';
 import {Speaker} from "../models/speaker.model";
+import {SpeakerStoreService} from "../stores/speaker-store.service";
 
 // js ml library in assets
 declare var ml: any;
 
 @Injectable()
 export class LogRegTrainerService {
+  // TODO class currently extracts data for all speakers every time extract Data is called
+  // TODO speaker data observable that can run data extraction when data changes
+  /**
+   * updateData(speaker, data) {
+   *    bind data to speaker
+   *    if all speakers have data, extract features for all speakers
+    * }
+   * */
 
-  constructor() { }
+  private speakers: Speaker[];
 
-  public train(speakers: Speaker[]) {
+  constructor(speakerStore: SpeakerStoreService) {
+    speakerStore.speakers.subscribe((speakers: Speaker[]) => {
+      this.speakers = speakers;
+    })
+  }
+
+  public train() {
     // TODO import a matrix
+    if (!this.speakers) return;
+    let speakers = this.speakers;
 
     let sampledSpeakers = speakers.filter((speaker) => {
       return speaker.voiceSample;
@@ -40,9 +57,9 @@ export class LogRegTrainerService {
       i += speaker.voiceSample.length;
     });
 
-    speakers.forEach((speaker) => {
-      speaker.logRegClassStream.train(allSamples, speaker.labelVector);
-    });
+    // speakers.forEach((speaker) => {
+    //   speaker.logRegClassStream.train(allSamples, speaker.labelVector);
+    // });
 
   }
 

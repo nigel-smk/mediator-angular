@@ -18,21 +18,21 @@ export class HomeComponent implements OnInit{
 
   constructor(private mediaStreamFeed: MediaStreamFeed,
               private speakerStore: SpeakerStoreService,
-              private logRegTrainer: LogRegTrainerService
+              // private logRegTrainer: LogRegTrainerService
   ) { }
 
-  onRecordRelease() {
-    // attempt to train the model
-    this.logRegTrainer.train(this.speakers);
-    this.startClassification();
-  }
+  // onRecordRelease() {
+  //   // attempt to train the model
+  //   // this.logRegTrainer.train(this.speakers);
+  //   this.startClassification();
+  // }
 
-  startClassification() {
-    if (this.speakers.filter((speaker) => speaker.voiceSample).length !== this.speakers.length) return;
-    this.speakers.forEach((speaker) => {
-      speaker.logRegClassStream.start();
-    });
-  }
+  // startClassification() {
+  //   if (this.speakers.filter((speaker) => speaker.voiceSample).length !== this.speakers.length) return;
+  //   this.speakers.forEach((speaker) => {
+  //     speaker.logRegClassStream.start();
+  //   });
+  // }
   //
   // stopClassification() {
   //   this.speakers.forEach((speaker) => {

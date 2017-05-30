@@ -1,6 +1,19 @@
-<div class="main" [ngClass]="{ 'highlight': speaker.logRegClassStream?.$ | async }">
-  <app-histogram></app-histogram>
+<div class="main" [ngSwitch]="currentPhase">
+  <div class="header">
+    <button type="button" class="prev-button" (click)="navPrev()" [disabled]="isPrevNavDisabled()"></button>
+    <h5>{{ speaker.name }}</h5>
+    <button type="button" class="next-button" (click)="navNext()" [disabled]="isNextNavDisabled()"></button>
+  </div>
+  <!--TODO http://stackoverflow.com/questions/35835984/how-to-use-a-typescript-enum-value-in-an-angular2-ngswitch-statement-->
+  <app-capture-sample [speaker]="speaker" (recordRelease)="navNext()" *ngSwitchCase="0"></app-capture-sample>
+  <app-sample-distribution [speaker]="speaker" *ngSwitchCase="1" (ready)="navNextPossible()"></app-sample-distribution>
+  <app-train [speaker]="speaker" (trained)="navNext()" *ngSwitchCase="2"></app-train>
+  <app-predict [speaker]="speaker" *ngSwitchCase="3"></app-predict>
 </div>
+
+<!--<div class="main" [ngClass]="{ 'highlight': speaker.logRegClassStream?.$ | async }">-->
+  <!--<app-histogram></app-histogram>-->
+<!--</div>-->
 <!--<div class="main" [ngClass]="{ 'highlight': speaker.logRegClassStream?.$ | async }">-->
   <!--<div class="content-section">-->
     <!--<div class="header">-->

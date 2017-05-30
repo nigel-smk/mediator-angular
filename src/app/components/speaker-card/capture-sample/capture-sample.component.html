@@ -1,0 +1,27 @@
+<div class="main" [ngClass]="{ 'highlight': speaker.logRegClassStream?.$ | async }">
+  <div class="content">
+    <p>I made myself a snowball
+      As perfect as could be.
+      I thought I’d keep it as a pet
+      And let it sleep with me.
+      I made it some pajamas
+      And a pillow for its head.
+      Then last night it ran away,
+      But first—it wet the bed.</p>
+  </div>
+  <div class="vr-wrap">
+    <div class="vr"></div>
+  </div>
+  <div class="action-section">
+    <div>
+      Click and hold to capture sample
+    </div>
+    <div class="record led-red" (mousedown)="startCapture(speaker, $event)" (mouseup)="stopCapture(speaker, $event)" >
+      <!--<div class="arrow"></div>-->
+      <!--<div class="blurb"></div>-->
+    </div>
+    <!--<div>-->
+      <!--<button type="button" (click)="test()">Replay Sample</button>-->
+    <!--</div>-->
+  </div>
+</div>
